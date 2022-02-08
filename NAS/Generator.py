@@ -1,20 +1,18 @@
 from torch import nn
 
 class Generator:
-    def __init__(self,num_classes, hidden_size,
-                 num_layers, learning_rate, activation_function):
+    def __init__(self):
         super().__init__()
 
-        layers=[]
+    def model(self, state):
+        # state num_classes, hidden_size,num_layers, learning_rate, activation_function
+
+        layers = []
         for layer in range(num_layers):
-            layers.append(nn.Linear(hidden_size,num_classes))
+            layers.append(nn.Linear(hidden_size, num_classes))
             layers.append(nn.Softmax)
         layers.append(nn.Dropout(0.25))
-        self.model=nn.Sequential(*layers)
-
-    def training(self,data_set):
-        self.model.train()
-
+        return nn.Sequential(*layers)
 
     # def model_keras(self):
     #     model = Sequential()

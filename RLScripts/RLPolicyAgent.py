@@ -1,11 +1,11 @@
 import numpy as np
-from keras.models import Sequential
 from keras.layers import Dense, Reshape, Flatten
-from tensorflow.keras.optimizers import Adam
 from keras.layers.convolutional import Convolution2D
+from keras.models import Sequential
+from tensorflow.keras.optimizers import Adam
 
 
-class RLReinforceAgent:
+class RLPolicyAgent:
     def __init__(self, state_size, action_size):
         self.state_size = state_size
         self.action_size = action_size
@@ -39,6 +39,7 @@ class RLReinforceAgent:
         self.rewards.append(reward)
 
     def act(self, state):
+        # TODO: if the prob is 0
         state = state.reshape([1, state.shape[0]])
         aprob = self.model.predict(state, batch_size=1).flatten()
         self.probs.append(aprob)
@@ -72,3 +73,4 @@ class RLReinforceAgent:
 
     def save(self, name):
         self.model.save_weights(name)
+
