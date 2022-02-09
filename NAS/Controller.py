@@ -26,7 +26,7 @@ class Controller:
         self.action_space = len(get_class_attributes(self.current_state))
         self.generator = Generator()
         self.nas_environment = NASEnvironment(dataset_path, target_class_label)
-        self.policy = RLPolicyAgent(self.action_space, self.action_space)
+        self.policy = RLPolicyAgent(self.action_space, self.action_space) # pagja
         self.done = False
         self.num_episodes = 15
         self.action_decoding_dict = self.create_action_dict()
@@ -45,7 +45,7 @@ class Controller:
 
     def controller_reset(self):
         """resets the environment and the initial state"""
-        self.nas_environment = NASEnviornment.reset(self.nas_environment)
+        self.nas_environment = NASEnvironment.reset(self.nas_environment)
         self.current_state = self.initial_state
 
     def get_model(self):
@@ -89,3 +89,10 @@ class Controller:
         self.run_episode()
         self.policy.train()
         return self.current_state
+
+
+if __name__ == '__main__':
+    datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
+                  "Sitemi/datasets/car.csv "
+    controller = Controller(datasetPath, "acceptability")
+    controller.controller_preform()

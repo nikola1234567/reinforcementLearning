@@ -15,12 +15,12 @@ class RLPolicyAgent:
         self.gradients = []
         self.rewards = []
         self.probs = []
-        self.model = self._build_model()
+        self.model = self._build_model() # pagja
         self.model.summary()
 
     def _build_model(self):
         model = Sequential()
-        model.add(Reshape((1, 80, 80), input_shape=(self.state_size,)))
+        model.add(Reshape((1, 80, 80), input_shape=(self.state_size,))) # pagja?
         model.add(Convolution2D(32, 6, 6, subsample=(3, 3), border_mode='same',
                                 activation='relu', init='he_uniform'))
         model.add(Flatten())
