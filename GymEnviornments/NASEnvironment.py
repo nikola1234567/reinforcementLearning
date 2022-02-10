@@ -29,7 +29,7 @@ class NASEnvironment(Env):
         self.done_counter += 1
         predictions = action.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
-        rounded_classes = np.argmax(test_c, axis=-1)
+        rounded_classes = np.argmax(test_c.to_numpy(), axis=1)
         reward = NeuralNetworkMetrics.accuracy(rounded_classes, rounded_predictions)
         done = self.done_counter == 2
         state = action
@@ -44,4 +44,5 @@ class NASEnvironment(Env):
 
     def reset(self):
         self.state = NeuralNetworkFactory.default_place_holder_network()
+        self.done_counter = 0
 

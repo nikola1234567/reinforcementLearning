@@ -1,5 +1,5 @@
 import numpy as np
-from keras.layers import Dense, Reshape, Flatten
+from keras.layers import Dense, Reshape, Flatten, Input
 from keras.layers.convolutional import Convolution2D
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
@@ -20,14 +20,10 @@ class RLPolicyAgent:
 
     def _build_model(self):
         model = Sequential()
-        model.add(Reshape((1, 80, 80), input_shape=(self.state_size,))) # pagja?
-        model.add(Convolution2D(32, 6, 6, subsample=(3, 3), border_mode='same',
-                                activation='relu', init='he_uniform'))
-        model.add(Flatten())
-        model.add(Dense(64, activation='relu', init='he_uniform'))
-        model.add(Dense(32, activation='relu', init='he_uniform'))
+        model.add(Input(shape=(self.state_size,)))
+        model.add(Dense(16, activation="relu"))
         model.add(Dense(self.action_size, activation='softmax'))
-        opt = Adam(lr=self.learning_rate)
+        opt = Adam(learning_rate=self.learning_rate)
         model.compile(loss='categorical_crossentropy', optimizer=opt)
         return model
 
@@ -61,7 +57,7 @@ class RLPolicyAgent:
         gradients = np.vstack(self.gradients)
         rewards = np.vstack(self.rewards)
         rewards = self.discount_rewards(rewards)
-        reward = (reward - np.mean(rewards)) / (np.std(rewards) + 1e-7)
+        rewards = (rewards - np.mean(rewards)) / (np.std(rewards) + 1e-7)
         gradients *= rewards
         X = np.squeeze(np.vstack([self.states]))
         Y = self.probs + self.learning_rate * np.squeeze(np.vstack([gradients]))
