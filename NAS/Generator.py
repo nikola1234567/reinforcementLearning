@@ -24,16 +24,16 @@ class Generator:
         opt = Adam(lr=0.00001)
         return model.compile(loss='categorical_crossentropy', optimizer=opt)
 
-    def model_keras(self, state, number_of_features, number_of_classes):
+    def model_keras(self, state):
         """:param state - object from class State
         :returns sequential keras model"""
         num_layers = state.num_layers
         hidden_size = state.hidden_size
         model = Sequential()
-        model.add(Input(shape=(number_of_features,)))
+        model.add(Input(shape=(state.num_features,)))
         for layer in range(num_layers - 1):
             model.add(Dense(hidden_size * 16, activation='relu'))
-        model.add(Dense(number_of_classes, activation='relu'))
+        model.add(Dense(state.num_classes, activation='relu'))
         opt = Adam(learning_rate=0.001)
-        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy', 'loss'])
+        model.compile(loss='categorical_crossentropy', optimizer=opt)
         return model
