@@ -32,7 +32,7 @@ class Controller:
         self.nas_environment = NASEnvironment(dataset_path, target_class_label)
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)  # pagja
         self.done = False
-        self.num_episodes = 2
+        self.num_episodes = 1
         self.action_decoding_dict = self.create_action_dict()
 
     def create_action_dict(self):

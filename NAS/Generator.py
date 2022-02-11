@@ -33,7 +33,7 @@ class Generator:
         model.add(Input(shape=(state.num_features,)))
         for layer in range(num_layers - 1):
             model.add(Dense(hidden_size * 16, activation='relu'))
-        model.add(Dense(state.num_classes, activation='relu'))
+        model.add(Dense(state.num_classes, activation='softmax'))
         opt = Adam(learning_rate=0.001)
         model.compile(loss='categorical_crossentropy', optimizer=opt)
         return model
