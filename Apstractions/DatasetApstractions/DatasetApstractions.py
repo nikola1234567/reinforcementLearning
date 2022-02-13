@@ -10,14 +10,12 @@ class ResultType(Enum):
 
 class Dataset:
 
-    def __init__(self, absolute_path, target_class_label, delimiter=","):
+    def __init__(self, absolute_path, delimiter=","):
         self.absolutePath = absolute_path
-        self.target_class_label = target_class_label
         self.csv_handler = CSVFileHandler(self.absolutePath, delimiter=delimiter)
         self.dataset_df = self.csv_handler.df()
-        encoded, logger = Encoders.encode(self.dataset_df)
+        encoded = Encoders.encode(self.dataset_df)
         self.encoded_dataset_df = encoded
-        self.encoded_dataset_logger = logger
 
     def dataset(self, result_type=ResultType.ENCODED):
         """
@@ -37,15 +35,22 @@ class Dataset:
         """
         return len(self.feature_names(result_type))
 
-    def class_label(self, result_type=ResultType.ENCODED):
+    def number_of_classes(self, result_type=ResultType.ENCODED):
         """
-        name of the classes columns in the dataset specified with the result_type
+        number of unique values for the classes in the dataset specified with the result_type
+        :param result_type: Should the method be applied on the encoded dataset or plain dataset (type - ResultType)
+        :return: number of classes (type - Int)
+        """
+        return len(self.classes_names(result_type))
+
+    def classes_names(self, result_type=ResultType.ENCODED):
+        """
+        name of the columns which are the target classes in the dataset specified with the result_type
         :param result_type: Should the method be applied on the encoded dataset or plain dataset (type - ResultType)
         :return: list of names (type - List)
         """
-        if result_type == ResultType.ENCODED:
-            return list(self.encoded_dataset_logger.column_header_value(self.target_class_label))
-        return [self.target_class_label]
+        working_dataset = self.dataset(result_type=result_type)
+        return filter(lambda name: name.startswith('class_'), list(working_dataset.columns))
 
     def feature_names(self, result_type=ResultType.ENCODED):
         """
@@ -53,16 +58,9 @@ class Dataset:
         :param result_type: Should the method be applied on the encoded dataset or plain dataset (type - ResultType)
         :return: list of feature names (type - List)
         """
-        data_frame = self.dataset(result_type)
-        return list(filter(lambda element: element not in self.class_label(result_type), list(data_frame.columns)))
-
-    def number_of_classes(self, result_type=ResultType.ENCODED):
-        """
-        number of unique values for the classes in the dataset specified with the result_type
-        :param result_type: Should the method be applied on the encoded dataset or plain dataset (type - ResultType)
-        :return: number of classes (type - Int)
-        """
-        return len(self.classes(result_type))
+        working_dataset = self.dataset(result_type=result_type)
+        return list(filter(lambda element: element not in self.classes_names(result_type=result_type),
+                           list(working_dataset.columns)))
 
     def classes(self, result_type=ResultType.ENCODED):
         """
@@ -140,9 +138,9 @@ if __name__ == '__main__':
     print(f'Feature names PLAIN: {dataset.feature_names(ResultType.PLAIN)}')
     print(f'Number of features ENCODED: {dataset.number_of_features()}')
     print(f'Number of features PLAIN: {dataset.number_of_features(ResultType.PLAIN)}')
-    print(f'Classes ENCODED: {dataset.classes()}')
-    print(f'Classes PLAIN: {dataset.classes(ResultType.PLAIN)}')
+    # print(f'Classes ENCODED: {dataset.classes()}')
+    # print(f'Classes PLAIN: {dataset.classes(ResultType.PLAIN)}')
     print(f'Number of classes ENCODED: {dataset.number_of_classes()}')
     print(f'Number of classes PLAIN: {dataset.number_of_classes(ResultType.PLAIN)}')
-    train_f, train_c, test_f, test_c, train, test = dataset.split_data()
+    # train_f, train_c, test_f, test_c, train, test = dataset.split_data()
     print("====================")

@@ -39,7 +39,7 @@ class EncoderLogger:
 class Encoders:
 
     @classmethod
-    def encode(cls, data):
+    def f_encode(cls, data):
         logger = EncoderLogger()
         categorical_columns = DataFrameWorker.categorical_columns(data)
         categorical_columns_indexes = DataFrameWorker.map_columns_to_index(data, categorical_columns)
@@ -60,6 +60,14 @@ class Encoders:
         list_name.sort()
         return dict, list_name
 
+    @classmethod
+    def encode(cls, data):
+        categorical_columns = DataFrameWorker.categorical_columns(data)
+        prefixes = {column: column for column in categorical_columns}
+        return pd.get_dummies(data,
+                              prefix=prefixes,
+                              drop_first=True)
+
 
 if __name__ == '__main__':
     # values = ['bad', 'good']
@@ -68,9 +76,14 @@ if __name__ == '__main__':
     print("=============== Label Encoder ===============\n")
     datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
                   "Sitemi/datasets/car.csv "
+    datasetPath2 = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
+                  "Sitemi/datasets/wine_quality.csv "
     dataframe = CSVFileHandler(datasetPath).df()
+    dataframe2 = CSVFileHandler(datasetPath2, delimiter=";").df()
     # print(Encoders.label_encoder(dataframe))
     # encoded = Encoders.one_hot_encoder(dataframe)
     # print(encoded)
     # print("\n\n==============================================================\n\n")
-    Encoders.encode(dataframe)
+    df_encoded = Encoders.encode(dataframe)
+    df_encoded2 = Encoders.encode(dataframe2)
+    print(df_encoded.shape)
