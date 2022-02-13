@@ -31,8 +31,7 @@ class Controller:
         self.generator = Generator()
         self.nas_environment = NASEnvironment(dataset_path, target_class_label)
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)  # pagja
-        self.done = False
-        self.num_episodes = 1
+        self.num_episodes = 3
         self.action_decoding_dict = self.create_action_dict()
 
     def create_action_dict(self):
@@ -49,7 +48,7 @@ class Controller:
 
     def controller_reset(self):
         """resets the environment and the initial state"""
-        # self.nas_environment = NASEnvironment.reset(self.nas_environment)
+        self.nas_environment.reset()
         self.current_state = self.initial_state
         self.actions = from_state_to_action(self.current_state)
 
@@ -74,13 +73,13 @@ class Controller:
          -generator creates a model from the current state parameters
          -environment trains the model with current state and returns reward and done flag
          -policy updates """
-        while not self.done:
+        done = False
+        while not done:
             action, prob = self.policy.act(self.actions.executable_actions())
             self.implement_action(action)
             model = self.get_model()
             state, reward, done, info = self.nas_environment.step(model)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
-            self.done = done
 
     def controller_preform(self):
         """preforms number of episodes and returns the best state
