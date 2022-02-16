@@ -5,7 +5,6 @@ import pandas as pd
 class CSVFileHandler:
 
     def __init__(self, file_path, delimiter=","):
-        # TODO: Check if absolute path leads to csv, throw custom exception otherwise
         self.filePath = file_path
         self.file_dataframe = pd.read_csv(file_path, delimiter=delimiter)
 

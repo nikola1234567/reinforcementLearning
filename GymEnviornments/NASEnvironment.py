@@ -2,14 +2,12 @@ import numpy as np
 from gym import Env
 from Apstractions.KerasApstractions.KerasNetworkMetrics import NeuralNetworkMetrics
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
-from Apstractions.KerasApstractions.KerasNetworkGenerator import NeuralNetworkFactory
 
 
 class NASEnvironment(Env):
 
-    def __init__(self, dataset_path, target_class_label, delimiter=","):
-        self.dataSet = Dataset(dataset_path, target_class_label, delimiter=delimiter)
-        self.state = NeuralNetworkFactory.default_place_holder_network()
+    def __init__(self, dataset_path, delimiter=","):
+        self.dataSet = Dataset(dataset_path, delimiter=delimiter)
         self.done_counter = 0
 
     def step(self, action):
@@ -36,13 +34,10 @@ class NASEnvironment(Env):
         info = {}
         return state, reward, done, info
 
-
     def render(self, mode="human"):
         # TODO: To be decided what to visualise
         # TODO: implement visualisations of diagrams with metrics, model summary etc.
-        self.state.summary()
+        pass
 
     def reset(self):
-        self.state = NeuralNetworkFactory.default_place_holder_network()
         self.done_counter = 0
-

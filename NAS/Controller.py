@@ -4,6 +4,7 @@ from GymEnviornments.NASEnvironment import NASEnvironment
 from NAS.Generator import Generator
 from NAS.State import State
 from RLScripts.RLPolicyAgent import RLPolicyAgent
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import CAR_DATASET_PATH
 
 
 def get_class_attributes(state):
@@ -13,17 +14,16 @@ def get_class_attributes(state):
 
 
 class Controller:
-    def __init__(self, dataset_path, target_class_label):
+    def __init__(self, dataset_path, dataset_delimiter=","):
         super().__init__()
-        # TODO:set target class label
         self.dataset_path = dataset_path
-        self.dataSet = Dataset(self.dataset_path, target_class_label)
+        self.dataSet = Dataset(self.dataset_path, delimiter=dataset_delimiter)
         self.initial_state = State(self.dataSet.number_of_classes(), 1, 1)
         self.current_state = self.initial_state
         self.action_space = len(get_class_attributes(self.current_state))
         self.generator = Generator()
-        self.nas_environment = NASEnvironment(dataset_path, target_class_label)
-        self.policy = RLPolicyAgent(self.action_space, self.action_space) # pagja
+        self.nas_environment = NASEnvironment(dataset_path)
+        self.policy = RLPolicyAgent(self.action_space, self.action_space)
         self.done = False
         self.num_episodes = 1
         self.action_decoding_dict = self.create_action_dict()
@@ -89,8 +89,7 @@ class Controller:
 
 
 if __name__ == '__main__':
-    datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
-                  "Sitemi/datasets/car.csv "
-    controller = Controller(datasetPath, "acceptability")
+    datasetPath = CAR_DATASET_PATH
+    controller = Controller(datasetPath)
     model = controller.controller_preform()
     print(model.executable_state())
