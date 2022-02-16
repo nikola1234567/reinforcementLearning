@@ -1,5 +1,5 @@
 import os
-from root_config import ROOT_DIR
+from configurations import ROOT_DIR
 
 
 def self():

@@ -1,6 +1,5 @@
 import numpy as np
-from keras.layers import Dense, Reshape, Flatten, Input
-from keras.layers.convolutional import Convolution2D
+from keras.layers import Dense, Input
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 
