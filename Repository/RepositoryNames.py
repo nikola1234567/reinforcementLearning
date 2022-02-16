@@ -1,1 +1,0 @@
-TAXI_V3_REPO_NAME = "Taxi-v3"
