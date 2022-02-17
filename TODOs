@@ -6,3 +6,9 @@ VIZUELIZACII
 PODOBRUVANJA
 -------------------------------------------
 - da se vovede pamtenje na broj na epizodi vo odnos na dataset
+-reward da se sredi (dali spored loss ili opaggjanje na accuracy) (nikola)
+-podobruvanje na modeli vo gererator za dataset(jana)
+-learning rate promeni (jana)
+-optimizator moze da se smeni (jana)
+-keras logger(nikola)
+-metrics na generator(jana)
