@@ -89,6 +89,7 @@ class Controller:
             self.controller_reset()
             self.policy.train()
 
+        self.policy.memorize_network(self.dataset_path)
         # self.run_episode()
         # self.policy.train()
         return self.current_state

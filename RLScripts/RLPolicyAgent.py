@@ -2,6 +2,7 @@ import numpy as np
 from keras.layers import Dense, Input
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
+from Apstractions.KerasApstractions.KerasLogger import KerasLogger
 
 
 class RLPolicyAgent:
@@ -14,7 +15,7 @@ class RLPolicyAgent:
         self.gradients = []
         self.rewards = []
         self.probs = []
-        self.model = self._build_model() # pagja
+        self.model = self._build_model()
         self.model.summary()
 
     def _build_model(self):
@@ -69,3 +70,13 @@ class RLPolicyAgent:
     def save(self, name):
         self.model.save_weights(name)
 
+    def memorize_network(self, dataset_path):
+        KerasLogger.save_network(self.model, dataset_path)
+
+    @staticmethod
+    def clean_logged_policy():
+        KerasLogger.clean_policy_log_history()
+
+
+if __name__ == '__main__':
+    RLPolicyAgent.clean_logged_policy()
