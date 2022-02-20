@@ -2,6 +2,7 @@ import ntpath
 from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import CAR_DATASET_PATH
 import os
 import shutil
+from configurations import POLICY_WEIGHTS_DIR
 
 
 class FileWorker:
@@ -27,6 +28,17 @@ class FileWorker:
             except Exception as e:
                 print('Failed to delete %s. Reason: %s' % (file_path, e))
 
+    @classmethod
+    def content_of_directory(cls, directory_path):
+        return os.listdir(directory_path)
+
+    @classmethod
+    def create_if_not_exist(cls, file_path):
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+
+
 if __name__ == '__main__':
     print(FileWorker.full_file_name(CAR_DATASET_PATH))
     print(FileWorker.file_name(CAR_DATASET_PATH))
+    print(FileWorker.content_of_directory(POLICY_WEIGHTS_DIR))

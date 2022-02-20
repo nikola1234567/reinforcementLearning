@@ -2,11 +2,12 @@ import numpy as np
 from keras.layers import Dense, Input
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
-from Apstractions.KerasApstractions.KerasLogger import KerasLogger
+from Apstractions.KerasApstractions.KerasLogger import KerasLogger, PolicyWeightsNotFound
 
 
 class RLPolicyAgent:
     def __init__(self, state_size, action_size):
+        KerasLogger.create_policy_dir_if_needed()
         self.state_size = state_size
         self.action_size = action_size
         self.gamma = 0.99
@@ -15,8 +16,14 @@ class RLPolicyAgent:
         self.gradients = []
         self.rewards = []
         self.probs = []
-        self.model = self._build_model()
+        self.model = self.load_model()
         self.model.summary()
+
+    def load_model(self):
+        try:
+            return KerasLogger.load_latest_policy()
+        except PolicyWeightsNotFound:
+            return self._build_model()
 
     def _build_model(self):
         model = Sequential()

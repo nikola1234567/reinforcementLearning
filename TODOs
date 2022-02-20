@@ -12,3 +12,9 @@ PODOBRUVANJA
 -optimizator moze da se smeni (jana)
 -keras logger(nikola)
 -metrics na generator(jana)
+
+KERAS LOGGER
+---------------------------------------------
+1) dali sekoe novo runnuvanje na polisata da gi loadira najnovo zacuvanite tezini?
+
+2) dali samo najnovite tezini da se cuvaat ili povekje (poslednite 5)?
