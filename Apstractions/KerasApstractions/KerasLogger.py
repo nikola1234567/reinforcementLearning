@@ -47,6 +47,7 @@ class KerasLogger:
     def create_policy_dir_if_needed(cls):
         FileWorker.create_if_not_exist(POLICY_WEIGHTS_DIR)
 
+
 if __name__ == '__main__':
     print(KerasLogger.logging_name(CAR_DATASET_PATH))
     print(KerasLogger.logging_path(CAR_DATASET_PATH))
