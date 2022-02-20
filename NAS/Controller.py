@@ -77,8 +77,8 @@ class Controller:
         while not done:
             action, prob = self.policy.act(self.actions.executable_actions())
             self.implement_action(action)
-            model = self.get_model()
-            state, reward, done, info = self.nas_environment.step(model)
+            action_model = self.get_model()
+            state, reward, done, info = self.nas_environment.step(action_model)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
         print("done")
 
