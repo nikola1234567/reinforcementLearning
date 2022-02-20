@@ -31,7 +31,7 @@ class Controller:
         self.generator = Generator()
         self.nas_environment = NASEnvironment(dataset_path)
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)
-        self.num_episodes = 3
+        self.num_episodes = 1
         self.action_decoding_dict = self.create_action_dict()
 
     def create_action_dict(self):
@@ -80,6 +80,7 @@ class Controller:
             model = self.get_model()
             state, reward, done, info = self.nas_environment.step(model)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
+        print("done")
 
     def controller_preform(self):
         """preforms number of episodes and returns the best state
