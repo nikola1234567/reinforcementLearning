@@ -18,5 +18,5 @@ class Generator:
             model.add(Dense(hidden_size * 16, activation='relu'))
         model.add(Dense(state.num_classes, activation='softmax'))
         opt = Adam(learning_rate=0.001)
-        model.compile(loss='categorical_crossentropy', optimizer=opt)
+        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy', 'mse'])
         return model

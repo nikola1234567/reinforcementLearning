@@ -1,10 +1,10 @@
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import CAR_DATASET_PATH
 from GymEnviornments.NASEnvironment import NASEnvironment
 from NAS.Actions import Actions
 from NAS.Generator import Generator
 from NAS.State import State
 from RLScripts.RLPolicyAgent import RLPolicyAgent
-from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import CAR_DATASET_PATH
 
 
 def get_class_attributes(class_object):
@@ -24,7 +24,7 @@ class Controller:
         super().__init__()
         self.dataset_path = dataset_path
         self.dataSet = Dataset(self.dataset_path, delimiter=dataset_delimiter)
-        self.initial_state = State(self.dataSet.number_of_classes(), self.dataSet.number_of_features(), 1, 1, 0.5)
+        self.initial_state = State(self.dataSet.number_of_classes(), self.dataSet.number_of_features(), 1, 1, 0.0001)
         self.current_state = self.initial_state
         self.actions = from_state_to_action(self.initial_state)
         self.action_space = len(get_class_attributes(self.actions))
