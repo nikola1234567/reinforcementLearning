@@ -1,4 +1,4 @@
-from keras.layers import Dense, Input
+from keras.layers import Dense, Input, Dropout
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
 
@@ -16,6 +16,8 @@ class Generator:
         model.add(Input(shape=(state.num_features,)))
         for layer in range(num_layers - 1):
             model.add(Dense(hidden_size * 16, activation='relu'))
+        if num_layers > 6:
+            model.add(Dropout(0.25))
         model.add(Dense(state.num_classes, activation='softmax'))
         opt = Adam(learning_rate=0.001)
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy', 'mse'])
