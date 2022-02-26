@@ -1,3 +1,5 @@
+import pandas as pd
+
 from Apstractions.FileApstractions.CSVApstractions import CSVFileHandler
 
 
@@ -34,10 +36,31 @@ class DataFrameWorker:
         """
         return [df.columns.get_loc(elem) for elem in columns]
 
+    @classmethod
+    def decreasing_or_constant(cls, dataframe):
+        """
+        A series is increasing/decreasing if more than 80% of the differences between
+        consecutive values are strictly increasing/decreasing.
+        :param dataframe: dataframe object with one column containing the series
+        :return: True if decreasing or constant, False otherwise
+        """
+        diff = dataframe[0] - dataframe[0].shift(1)
+        # if less than 20% are smaller than their successor the series is increasing
+        increasing = (diff <= 0).sum() <= 0.2 * len(dataframe)
+        if increasing:
+            return False
+        # if less than 20% are bigger than their successor the series is decreasing
+        decreasing = (diff >= 0).sum() <= 0.2 * len(dataframe)
+        if decreasing:
+            return True
+        if not increasing and not decreasing:
+            return True
+
 
 if __name__ == '__main__':
-    datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
-                  "Sitemi/datasets/wine_quality.csv "
-    dataframe = CSVFileHandler(datasetPath, delimiter=";").df()
-    print(DataFrameWorker.categorical_columns(dataframe))
-    print(DataFrameWorker.map_columns_to_index(dataframe, ['quality', 'alcohol']))
+    df = pd.DataFrame([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    print(DataFrameWorker.decreasing_or_constant(df))
+    df = pd.DataFrame([10, 11, 12, 13, 10, 6, 7, 7, 6, 5])
+    print(DataFrameWorker.decreasing_or_constant(df))
+    df = pd.DataFrame([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+    print(DataFrameWorker.decreasing_or_constant(df))
