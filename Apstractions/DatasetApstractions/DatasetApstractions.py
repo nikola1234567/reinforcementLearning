@@ -1,6 +1,7 @@
 from enum import Enum
 from sklearn import model_selection
 from Apstractions.DataPreprocessing.DataEncoders import *
+from Apstractions.FileApstractions.FileWorker import FileWorker
 
 
 class ResultType(Enum):
@@ -98,6 +99,26 @@ class Dataset:
         features = data[[column for column in data.columns if column not in c_labels]]
         classes = data[c_labels]
         return features, classes
+
+    def name(self):
+        return FileWorker.file_name(self.absolute_path)
+
+    def configuration(self, result_type=ResultType.ENCODED):
+        return DatasetConfiguration(self.number_of_features(result_type=result_type),
+                                    self.number_of_classes(result_type=result_type),
+                                    len(DataFrameWorker.categorical_columns(df=self.dataset_df)),
+                                    self.name())
+
+
+class DatasetConfiguration:
+    def __init__(self, number_of_features, number_of_classes, number_of_categorical_features, dataset_name):
+        self.number_of_features = number_of_features
+        self.number_of_classes = number_of_classes
+        self.number_of_categorical_features = number_of_categorical_features
+        self.dataset_name = dataset_name
+
+    def executable_configuration(self):
+        return [self.dataset_name, self.number_of_features, self.number_of_classes, self.number_of_categorical_features]
 
 
 if __name__ == '__main__':

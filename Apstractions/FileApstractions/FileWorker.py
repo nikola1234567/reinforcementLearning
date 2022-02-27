@@ -37,6 +37,9 @@ class FileWorker:
         if not os.path.exists(file_path):
             os.makedirs(file_path)
 
+    @classmethod
+    def exists(cls, file_path):
+        return os.path.exists(file_path)
 
 if __name__ == '__main__':
     print(FileWorker.full_file_name(CAR_DATASET_PATH))

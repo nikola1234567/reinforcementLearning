@@ -32,7 +32,7 @@ class KerasLogger:
 
     @classmethod
     def clean_policy_log_history(cls):
-        FileWorker.clean_directory(POLICY_WEIGHTS_DIR)
+        KerasLogger.clean_network_directory(directory_path=POLICY_WEIGHTS_DIR)
 
     @classmethod
     def load_latest_policy(cls):
@@ -45,7 +45,25 @@ class KerasLogger:
 
     @classmethod
     def create_policy_dir_if_needed(cls):
-        FileWorker.create_if_not_exist(POLICY_WEIGHTS_DIR)
+        KerasLogger.create_network_directory_if_needed(directory_path=POLICY_WEIGHTS_DIR)
+
+    @staticmethod
+    def save_custom_network(location_path, network_name, network):
+        full_network_name = '{}.h5'.format(network_name)
+        model_name = os.path.join(location_path, full_network_name)
+        network.save(model_name)
+
+    @staticmethod
+    def clean_network_directory(directory_path):
+        if FileWorker.exists(file_path=directory_path):
+            FileWorker.clean_directory(directory_path=directory_path)
+        else:
+            pass
+
+    @staticmethod
+    def create_network_directory_if_needed(directory_path):
+        FileWorker.create_if_not_exist(file_path=directory_path)
+
 
 
 if __name__ == '__main__':

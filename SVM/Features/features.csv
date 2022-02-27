@@ -1,0 +1,6 @@
+dataset_name,number of features,number of classes,number of categorical features,network name
+
+car,21,4,7,e85b9ae8-a14b-40d4-a0b9-66951d2c2381
+car,21,4,7,981fc8ac-2ede-4637-a9f2-d975cd49e8d5
+car,21,4,7,0141544e-99f1-4258-a7a4-00cc48acafc5
+car,21,4,7,0da218e5-5e13-4595-bca6-e8cc07fe62cd
