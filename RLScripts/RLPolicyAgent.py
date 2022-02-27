@@ -1,13 +1,22 @@
+import time
+
 import numpy as np
 from keras.layers import Dense, Input
 from keras.models import Sequential
+from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.optimizers import Adam
+
+from Apstractions.FileApstractions.FileWorker import FileWorker
 from Apstractions.KerasApstractions.KerasLogger import KerasLogger, PolicyWeightsNotFound
+from configurations import POLICY_LOGS_DIR
+
+LOGS_NAME = 'policy_{}'.format(int(time.time()))
 
 
 class RLPolicyAgent:
     def __init__(self, state_size, action_size):
         KerasLogger.create_policy_dir_if_needed()
+        FileWorker.create_if_not_exist(POLICY_LOGS_DIR)
         self.state_size = state_size
         self.action_size = action_size
         self.gamma = 0.99
@@ -18,6 +27,9 @@ class RLPolicyAgent:
         self.probs = []
         self.model = self.load_model()
         self.model.summary()
+        self.tensorBoardCallback = TensorBoard(log_dir='{}/{}'.format(POLICY_LOGS_DIR, LOGS_NAME), write_graph=True,
+                                               write_grads=True)
+        self.tensorBoardCallback.set_model(self.model)
 
     def load_model(self):
         try:
@@ -69,6 +81,7 @@ class RLPolicyAgent:
         X = np.squeeze(np.vstack([self.states]))
         Y = self.probs + self.learning_rate * np.squeeze(np.vstack([gradients]))
         self.model.train_on_batch(X, Y)
+        self.tensorBoardCallback.on_train_end(logs=None)
         self.states, self.probs, self.gradients, self.rewards = [], [], [], []
 
     def load(self, name):
