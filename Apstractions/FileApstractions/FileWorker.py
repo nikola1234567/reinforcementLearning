@@ -2,7 +2,7 @@ import ntpath
 from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import CAR_DATASET_PATH
 import os
 import shutil
-from configurations import POLICY_WEIGHTS_DIR
+from configurations import POLICY_WEIGHTS_DIR, POLICY_EPOCH_TRACKER
 
 
 class FileWorker:
@@ -37,8 +37,23 @@ class FileWorker:
         if not os.path.exists(file_path):
             os.makedirs(file_path)
 
+    @staticmethod
+    def read_first_character(file_path):
+        file = open(file_path, 'r')
+        first_char = file.read(1)
+        file.close()
+        return first_char
+
+    @staticmethod
+    def force_save(file_path, content):
+        file = open(file_path, 'w')
+        file.write(str(content))
+        file.close()
+
 
 if __name__ == '__main__':
     print(FileWorker.full_file_name(CAR_DATASET_PATH))
     print(FileWorker.file_name(CAR_DATASET_PATH))
     print(FileWorker.content_of_directory(POLICY_WEIGHTS_DIR))
+    print(FileWorker.read_first_character(POLICY_EPOCH_TRACKER))
+    FileWorker.force_save(POLICY_EPOCH_TRACKER, str(3))

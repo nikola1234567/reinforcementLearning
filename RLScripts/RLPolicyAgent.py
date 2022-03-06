@@ -8,9 +8,16 @@ from tensorflow.keras.optimizers import Adam
 
 from Apstractions.FileApstractions.FileWorker import FileWorker
 from Apstractions.KerasApstractions.KerasLogger import KerasLogger, PolicyWeightsNotFound
-from configurations import POLICY_LOGS_DIR
+from configurations import POLICY_LOGS_DIR, POLICY_EPOCH_TRACKER
 
 LOGS_NAME = 'policy_{}'.format(int(time.time()))
+
+
+def named_logs(model, logs):
+    result = {}
+    for l in zip(model.metrics_names, logs):
+        result[l[0]] = l[1]
+    return result
 
 
 class RLPolicyAgent:
@@ -27,7 +34,10 @@ class RLPolicyAgent:
         self.probs = []
         self.model = self.load_model()
         self.model.summary()
-        self.tensorBoardCallback = TensorBoard(log_dir='{}/{}'.format(POLICY_LOGS_DIR, LOGS_NAME), write_graph=True,
+        self.epoch_id = self.get_epoch()
+        self.tensorBoardCallback = TensorBoard(log_dir='{}/{}'.format(POLICY_LOGS_DIR, LOGS_NAME),
+                                               histogram_freq=True,
+                                               write_graph=True,
                                                write_grads=True)
         self.tensorBoardCallback.set_model(self.model)
 
@@ -43,7 +53,7 @@ class RLPolicyAgent:
         model.add(Dense(16, activation="relu"))
         model.add(Dense(self.action_size, activation='softmax'))
         opt = Adam(learning_rate=self.learning_rate)
-        model.compile(loss='categorical_crossentropy', optimizer=opt)
+        model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy', 'mse'])
         return model
 
     def memorize(self, state, action, prob, reward):
@@ -80,8 +90,11 @@ class RLPolicyAgent:
         gradients *= rewards
         X = np.squeeze(np.vstack([self.states]))
         Y = self.probs + self.learning_rate * np.squeeze(np.vstack([gradients]))
-        self.model.train_on_batch(X, Y)
-        self.tensorBoardCallback.on_train_end(logs=None)
+        train_logs = self.model.train_on_batch(X, Y)
+        self.tensorBoardCallback.on_epoch_end(epoch=self.epoch_id,
+                                              logs=named_logs(model=self.model,
+                                                              logs=train_logs))
+        self.set_epoch()
         self.states, self.probs, self.gradients, self.rewards = [], [], [], []
 
     def load(self, name):
@@ -92,6 +105,14 @@ class RLPolicyAgent:
 
     def memorize_network(self, dataset_path):
         KerasLogger.save_network(self.model, dataset_path)
+
+    @staticmethod
+    def get_epoch():
+        return int(FileWorker.read_first_character(POLICY_EPOCH_TRACKER))
+
+    def set_epoch(self):
+        self.epoch_id += 1
+        FileWorker.force_save(POLICY_EPOCH_TRACKER, self.epoch_id)
 
     @staticmethod
     def clean_logged_policy():
