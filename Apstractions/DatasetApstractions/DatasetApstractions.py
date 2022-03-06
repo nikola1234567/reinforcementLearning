@@ -1,7 +1,10 @@
 from enum import Enum
+
+import pandas as pd
 from sklearn import model_selection
 from Apstractions.DataPreprocessing.DataEncoders import *
 from Apstractions.FileApstractions.FileWorker import FileWorker
+from sklearn.decomposition import PCA
 
 
 class ResultType(Enum):
@@ -109,6 +112,10 @@ class Dataset:
                                     len(DataFrameWorker.categorical_columns(df=self.dataset_df)),
                                     self.name())
 
+    def reduced_with_pca(self, new_number_of_features):
+        pca = PCA(n_components=new_number_of_features)
+        return pd.DataFrame(pca.fit_transform(self.encoded_dataset_df))
+
 
 class DatasetConfiguration:
     def __init__(self, number_of_features, number_of_classes, number_of_categorical_features, dataset_name):
@@ -134,4 +141,6 @@ if __name__ == '__main__':
     print(f'Number of classes ENCODED: {dataset.number_of_classes()}')
     print(f'Number of classes PLAIN: {dataset.number_of_classes(ResultType.PLAIN)}')
     train_f, train_c, test_f, test_c, train, test = dataset.split_data()
+    reduced = dataset.reduced_with_pca(new_number_of_features=3)
     print("====================")
+

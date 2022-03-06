@@ -42,6 +42,7 @@ class SVM:
         KerasLogger.clean_network_directory(SVM_CLASSES_DIR)
 
 
+
 if __name__ == '__main__':
     # SVM.clean_svm_classes()
     generator = Generator()
