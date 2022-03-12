@@ -1,6 +1,7 @@
 from enum import Enum
 from sklearn import model_selection
 from Apstractions.DataPreprocessing.DataEncoders import *
+import numpy as np
 
 
 class ResultType(Enum):
@@ -96,7 +97,9 @@ class Dataset:
         """
         c_labels = self.classes_names(result_type)
         features = data[[column for column in data.columns if column not in c_labels]]
+        features = np.asarray(features).astype(np.float32)
         classes = data[c_labels]
+        classes = np.asarray(classes).astype(np.float32)
         return features, classes
 
 

@@ -31,7 +31,7 @@ class NASEnvironment(Env):
         action.fit(x=train_f, y=train_c, batch_size=10, epochs=30)
         predictions = action.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
-        rounded_classes = np.argmax(test_c.to_numpy(), axis=1)
+        rounded_classes = np.argmax(test_c, axis=1)
         reward = NeuralNetworkMetrics.accuracy(rounded_classes, rounded_predictions)
         self.rewards.append(reward)
         state = action
