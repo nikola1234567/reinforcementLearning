@@ -1,5 +1,5 @@
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
-from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import CAR_DATASET_PATH
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import POKEMON_DATASET_PATH
 from GymEnviornments.NASEnvironment import NASEnvironment
 from NAS.Actions import Actions
 from NAS.Generator import Generator
@@ -80,7 +80,6 @@ class Controller:
             action_model = self.get_model()
             state, reward, done, info = self.nas_environment.step(action_model)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
-        print("done")
 
     def controller_preform(self):
         """preforms number of episodes and returns the best state
@@ -91,13 +90,10 @@ class Controller:
             self.policy.train()
 
         self.policy.memorize_network(self.dataset_path)
-        # self.run_episode()
-        # self.policy.train()
         return self.current_state
 
 
 if __name__ == '__main__':
-    datasetPath = CAR_DATASET_PATH
-    controller = Controller(datasetPath)
+    controller = Controller(POKEMON_DATASET_PATH)
     model = controller.controller_preform()
-    print(model.executable_state())
+    print(model)
