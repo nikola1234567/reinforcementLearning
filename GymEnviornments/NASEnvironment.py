@@ -2,10 +2,11 @@ import keras.callbacks
 import numpy as np
 from gym import Env
 from Apstractions.KerasApstractions.KerasNetworkMetrics import NeuralNetworkMetrics
-from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
+from Apstractions.DatasetApstractions.DatasetApstractions import Dataset, ResultType
 import pandas as pd
 from Apstractions.DataPreprocessing.PandasApstractions import DataFrameWorker
 from TensorBoard.TensorBoardCustomManager import TensorBoardStandardManager
+from TensorBoard.utils import get_confusion_matrix
 
 REWARD_SERIES_KEY = "rewards during playing"
 NUMBER_OF_ACTIONS_EXECUTED_KEY = "taken actions"
@@ -39,6 +40,9 @@ class NASEnvironment(Env):
         predictions = action.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
+        self.log_confusion_matrix(manager=tensorboard_manager,
+                                  y=rounded_classes,
+                                  y_predictions=rounded_predictions)
         reward = NeuralNetworkMetrics.accuracy(rounded_classes, rounded_predictions)
         self.rewards.append(reward)
         state = action
@@ -58,3 +62,12 @@ class NASEnvironment(Env):
     def is_done(self):
         df = pd.DataFrame(self.rewards)
         return DataFrameWorker.decreasing_or_constant(df)
+
+    def log_confusion_matrix(self, manager, y, y_predictions):
+        class_names = self.dataSet.classes(result_type=ResultType.PLAIN)
+        matrix = get_confusion_matrix(y_labels=y,
+                                      predictions=y_predictions,
+                                      class_names=class_names)
+        manager.save_confusion_matrix(step=len(self.rewards) + 1,
+                                      confusion=matrix,
+                                      class_names=class_names)

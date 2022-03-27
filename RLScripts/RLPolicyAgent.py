@@ -24,7 +24,6 @@ def named_logs(model, logs):
 class RLPolicyAgent:
     def __init__(self, state_size, action_size):
         KerasLogger.create_policy_dir_if_needed()
-        FileWorker.create_if_not_exist(POLICY_LOGS_DIR)
         self.state_size = state_size
         self.action_size = action_size
         self.gamma = 0.99

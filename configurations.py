@@ -18,7 +18,3 @@ POLICY_EPOCH_TRACKER = os.path.join(*policy_epoch_tracker)
 # LOGS DIR
 tensorboard_logs_dir = '{},TensorBoard,Logs'.format(ROOT_DIR).split(",")
 TENSORBOARD_LOGS_DIR = os.path.join(*tensorboard_logs_dir)
-
-
-if __name__ == '__main__':
-    print(TENSORBOARD_LOGS_DIR.replace("\\", "/"))

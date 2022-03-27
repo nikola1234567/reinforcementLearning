@@ -106,10 +106,19 @@ class Dataset:
     def name(self):
         return FileWorker.file_name(self.absolute_path)
 
+    def classes(self, result_type=ResultType.ENCODED):
+        classes = self.dataset(result_type=result_type) \
+            .groupby(self.classes_names(result_type=result_type)) \
+            .size() \
+            .reset_index() \
+            .rename(columns={0: 'count'})
+        classes = classes.drop('count', axis=1)
+        return DataFrameWorker.row_list(classes)
+
 
 if __name__ == '__main__':
     datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
-                  "Sitemi/datasets/car.csv "
+                  "Sitemi/datasets/Car.csv "
     dataset = Dataset(datasetPath)
     print(f'Feature names ENCODED: {dataset.feature_names()}')
     print(f'Feature names PLAIN: {dataset.feature_names(ResultType.PLAIN)}')
@@ -121,3 +130,5 @@ if __name__ == '__main__':
     print(f'Number of classes PLAIN: {dataset.number_of_classes(ResultType.PLAIN)}')
     train_f, train_c, test_f, test_c, train, test = dataset.split_data()
     print("====================")
+    print(f'Classes unique ENCODED\n {dataset.classes()}')
+    print(f'Classes unique PLAIN\n {dataset.classes(result_type=ResultType.PLAIN)}')
