@@ -1,5 +1,5 @@
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
-from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import POKEMON_DATASET_PATH
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import *
 from GymEnviornments.NASEnvironment import NASEnvironment
 from NAS.Actions import Actions
 from NAS.Generator import Generator
@@ -94,6 +94,6 @@ class Controller:
 
 
 if __name__ == '__main__':
-    controller = Controller(POKEMON_DATASET_PATH)
+    controller = Controller(HEART_FAILURE_DATASET_PATH)
     model = controller.controller_preform()
     print(model)

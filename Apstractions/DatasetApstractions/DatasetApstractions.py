@@ -1,6 +1,7 @@
 from enum import Enum
 from sklearn import model_selection
 from Apstractions.DataPreprocessing.DataEncoders import *
+from Apstractions.FileApstractions.FileWorker import FileWorker
 import numpy as np
 
 
@@ -101,6 +102,9 @@ class Dataset:
         classes = data[c_labels]
         classes = np.asarray(classes).astype(np.float32)
         return features, classes
+
+    def name(self):
+        return FileWorker.file_name(self.absolute_path)
 
 
 if __name__ == '__main__':

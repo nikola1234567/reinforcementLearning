@@ -11,5 +11,7 @@ def self():
 
 SELF_PATH = self()
 
-CAR_DATASET_PATH = os.path.join(SELF_PATH, "car.csv")
+CAR_DATASET_PATH = os.path.join(SELF_PATH, "Car.csv")
 POKEMON_DATASET_PATH = os.path.join(SELF_PATH, "Pokemon.csv")
+MOBILE_PHONES_DATASET_PATH = os.path.join(SELF_PATH, "MobilePhones.csv")
+HEART_FAILURE_DATASET_PATH = os.path.join(SELF_PATH, "Heart.csv")

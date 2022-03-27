@@ -3,14 +3,15 @@ import time
 import numpy as np
 from keras.layers import Dense, Input
 from keras.models import Sequential
-from tensorflow.keras.callbacks import TensorBoard
 from tensorflow.keras.optimizers import Adam
 
 from Apstractions.FileApstractions.FileWorker import FileWorker
 from Apstractions.KerasApstractions.KerasLogger import KerasLogger, PolicyWeightsNotFound
 from configurations import POLICY_LOGS_DIR, POLICY_EPOCH_TRACKER
+from TensorBoard.TensorBoardCustomManager import TensorBoardCustomManager
 
-LOGS_NAME = 'policy_{}'.format(int(time.time()))
+
+NAME = 'POLICY'
 
 
 def named_logs(model, logs):
@@ -35,11 +36,7 @@ class RLPolicyAgent:
         self.model = self.load_model()
         self.model.summary()
         self.epoch_id = self.get_epoch()
-        self.tensorBoardCallback = TensorBoard(log_dir='{}/{}'.format(POLICY_LOGS_DIR, LOGS_NAME),
-                                               histogram_freq=True,
-                                               write_graph=True,
-                                               write_grads=True)
-        self.tensorBoardCallback.set_model(self.model)
+        self.tensorBoardManager = TensorBoardCustomManager(name=NAME)
 
     def load_model(self):
         try:
@@ -91,9 +88,12 @@ class RLPolicyAgent:
         X = np.squeeze(np.vstack([self.states]))
         Y = self.probs + self.learning_rate * np.squeeze(np.vstack([gradients]))
         train_logs = self.model.train_on_batch(X, Y)
-        self.tensorBoardCallback.on_epoch_end(epoch=self.epoch_id,
-                                              logs=named_logs(model=self.model,
-                                                              logs=train_logs))
+        logs = named_logs(model=self.model,
+                          logs=train_logs)
+        self.tensorBoardManager.save(loss=logs["loss"],
+                                     accuracy=logs["accuracy"],
+                                     mse=logs["mse"],
+                                     step=self.epoch_id)
         self.set_epoch()
         self.states, self.probs, self.gradients, self.rewards = [], [], [], []
 

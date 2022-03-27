@@ -1,9 +1,11 @@
+import keras.callbacks
 import numpy as np
 from gym import Env
 from Apstractions.KerasApstractions.KerasNetworkMetrics import NeuralNetworkMetrics
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
 import pandas as pd
 from Apstractions.DataPreprocessing.PandasApstractions import DataFrameWorker
+from TensorBoard.TensorBoardCustomManager import TensorBoardStandardManager
 
 REWARD_SERIES_KEY = "rewards during playing"
 NUMBER_OF_ACTIONS_EXECUTED_KEY = "taken actions"
@@ -27,8 +29,13 @@ class NASEnvironment(Env):
                     3. done - if the rewards starts to constantly decrease (currently done after 3 iterations)
                     4. info - empty (for now)
         """
+        tensorboard_manager = TensorBoardStandardManager(name=self.dataSet.name())
         train_f, train_c, test_f, test_c, train, test = self.dataSet.split_data()
-        action.fit(x=train_f, y=train_c, batch_size=10, epochs=30)
+        action.fit(x=train_f,
+                   y=train_c,
+                   batch_size=10,
+                   epochs=30,
+                   callbacks=[tensorboard_manager.callback(len(self.rewards) + 1)])
         predictions = action.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
