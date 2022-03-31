@@ -97,6 +97,6 @@ class Controller:
 
 
 if __name__ == '__main__':
-    controller = Controller(MOBILE_PHONES_DATASET_PATH)
+    controller = Controller(HEART_FAILURE_DATASET_PATH)
     model = controller.controller_preform()
     print(model)

@@ -86,4 +86,5 @@ class TensorBoardStandardManager(TensorBoardCustomManager):
 
     def callback(self, iteration):
         path = self.create_inner_log_dir(step=iteration)
-        return keras.callbacks.TensorBoard(log_dir=path)
+        return keras.callbacks.TensorBoard(log_dir=path,
+                                           profile_batch='500,520')
