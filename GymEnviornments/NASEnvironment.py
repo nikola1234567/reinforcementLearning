@@ -30,20 +30,26 @@ class NASEnvironment(Env):
                     3. done - if the rewards starts to constantly decrease (currently done after 3 iterations)
                     4. info - empty (for now)
         """
+        model = action.neural_network_model()
         tensorboard_manager = TensorBoardStandardManager(name=self.dataSet.name())
         train_f, train_c, test_f, test_c, train, test = self.dataSet.split_data()
-        action.fit(x=train_f,
-                   y=train_c,
-                   batch_size=10,
-                   epochs=30,
-                   callbacks=[tensorboard_manager.callback(len(self.rewards) + 1)])
-        predictions = action.predict(x=test_f, batch_size=10, verbose=0)
+        model.fit(x=train_f,
+                  y=train_c,
+                  batch_size=10,
+                  epochs=30,
+                  callbacks=[tensorboard_manager.callback(len(self.rewards) + 1)])
+        predictions = model.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
         self.log_confusion_matrix(manager=tensorboard_manager,
                                   y=rounded_classes,
                                   y_predictions=rounded_predictions)
         reward = NeuralNetworkMetrics.accuracy(rounded_classes, rounded_predictions)
+        self.log_hyper_parameters(manager=tensorboard_manager,
+                                  number_of_layers=action.number_of_layers(),
+                                  hidden_size=action.hidden_size(),
+                                  learning_rate=action.learning_rate(),
+                                  accuracy=reward)
         self.rewards.append(reward)
         state = action
         done = self.is_done()
@@ -71,3 +77,10 @@ class NASEnvironment(Env):
         manager.save_confusion_matrix(step=len(self.rewards) + 1,
                                       confusion=matrix,
                                       class_names=class_names)
+
+    @staticmethod
+    def log_hyper_parameters(manager, number_of_layers, hidden_size, learning_rate, accuracy):
+        manager.save_hparams(number_of_layers=number_of_layers,
+                             hidden_size=hidden_size,
+                             learning_rate=learning_rate,
+                             accuracy=accuracy)

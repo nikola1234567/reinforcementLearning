@@ -5,6 +5,7 @@ from NAS.Actions import Actions
 from NAS.Generator import Generator
 from NAS.State import State
 from RLScripts.RLPolicyAgent import RLPolicyAgent
+from GymEnviornments.NASAction import NASAction
 
 
 def get_class_attributes(class_object):
@@ -78,7 +79,9 @@ class Controller:
             action, prob = self.policy.act(self.actions.executable_actions())
             self.implement_action(action)
             action_model = self.get_model()
-            state, reward, done, info = self.nas_environment.step(action_model)
+            nas_action = NASAction(state=self.current_state,
+                                   network=action_model)
+            state, reward, done, info = self.nas_environment.step(nas_action)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
 
     def controller_preform(self):
