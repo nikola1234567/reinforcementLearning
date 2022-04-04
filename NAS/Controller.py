@@ -1,11 +1,17 @@
+import time
+
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
 from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import *
-from GymEnviornments.NASEnvironment import NASEnvironment
+from GymEnviornments.NASEnvironment import NASEnvironment, NUMBER_OF_ACTIONS_EXECUTED_KEY
 from NAS.Actions import Actions
 from NAS.Generator import Generator
 from NAS.State import State
 from RLScripts.RLPolicyAgent import RLPolicyAgent
 from GymEnviornments.NASAction import NASAction
+from TensorBoard.TensorBoardCustomManager import TensorBoardCustomManager
+
+
+EPISODE_ITERATIONS = "episode_iteration"
 
 
 def get_class_attributes(class_object):
@@ -34,6 +40,7 @@ class Controller:
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)
         self.num_episodes = 2
         self.action_decoding_dict = self.create_action_dict()
+        self.tensor_board_manager = TensorBoardCustomManager(name='ReinforceScalars')
 
     def create_action_dict(self):
         """:returns dict {action number:attribute name}"""
@@ -75,6 +82,7 @@ class Controller:
          -environment trains the model with current state and returns reward and done flag
          -policy updates """
         done = False
+        info = {}
         while not done:
             action, prob = self.policy.act(self.actions.executable_actions())
             self.implement_action(action)
@@ -84,6 +92,9 @@ class Controller:
                                    episode_number=episode_number)
             state, reward, done, info = self.nas_environment.step(nas_action)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
+        self.tensor_board_manager.save(scalar_name=EPISODE_ITERATIONS,
+                                       scalar=info[NUMBER_OF_ACTIONS_EXECUTED_KEY],
+                                       step=int(time.time()))
 
     def controller_preform(self):
         """preforms number of episodes and returns the best state
@@ -98,6 +109,6 @@ class Controller:
 
 
 if __name__ == '__main__':
-    controller = Controller(CAR_DATASET_PATH)
+    controller = Controller(MOBILE_PHONES_DATASET_PATH)
     model = controller.controller_preform()
     print(model)

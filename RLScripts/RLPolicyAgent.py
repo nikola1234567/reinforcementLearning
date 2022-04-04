@@ -4,21 +4,7 @@ import numpy as np
 from keras.layers import Dense, Input
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
-
-from Apstractions.FileApstractions.FileWorker import FileWorker
 from Apstractions.KerasApstractions.KerasLogger import KerasLogger, PolicyWeightsNotFound
-from configurations import POLICY_LOGS_DIR, POLICY_EPOCH_TRACKER
-from TensorBoard.TensorBoardCustomManager import TensorBoardCustomManager
-
-
-NAME = 'POLICY'
-
-
-def named_logs(model, logs):
-    result = {}
-    for l in zip(model.metrics_names, logs):
-        result[l[0]] = l[1]
-    return result
 
 
 class RLPolicyAgent:
@@ -33,9 +19,6 @@ class RLPolicyAgent:
         self.rewards = []
         self.probs = []
         self.model = self.load_model()
-        self.model.summary()
-        self.epoch_id = self.get_epoch()
-        self.tensorBoardManager = TensorBoardCustomManager(name=NAME)
 
     def load_model(self):
         try:
@@ -86,14 +69,7 @@ class RLPolicyAgent:
         gradients *= rewards
         X = np.squeeze(np.vstack([self.states]))
         Y = self.probs + self.learning_rate * np.squeeze(np.vstack([gradients]))
-        train_logs = self.model.train_on_batch(X, Y)
-        logs = named_logs(model=self.model,
-                          logs=train_logs)
-        self.tensorBoardManager.save(loss=logs["loss"],
-                                     accuracy=logs["accuracy"],
-                                     mse=logs["mse"],
-                                     step=self.epoch_id)
-        self.set_epoch()
+        self.model.train_on_batch(X, Y)
         self.states, self.probs, self.gradients, self.rewards = [], [], [], []
 
     def load(self, name):
@@ -104,14 +80,6 @@ class RLPolicyAgent:
 
     def memorize_network(self, dataset_path):
         KerasLogger.save_network(self.model, dataset_path)
-
-    @staticmethod
-    def get_epoch():
-        return int(FileWorker.read_first_character(POLICY_EPOCH_TRACKER))
-
-    def set_epoch(self):
-        self.epoch_id += 1
-        FileWorker.force_save(POLICY_EPOCH_TRACKER, self.epoch_id)
 
     @staticmethod
     def clean_logged_policy():

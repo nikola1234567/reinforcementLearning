@@ -5,10 +5,6 @@ from TensorBoard.utils import plot_confusion_matrix
 from tensorboard.plugins.hparams import api as hp
 import os
 
-LOSS = "Loss"
-ACCURACY = "Accuracy"
-MSE = "Mean square error"
-
 
 def step_to_string(step):
     return 'step_{}'.format(step)
@@ -28,13 +24,11 @@ class TensorBoardCustomManager:
         self.name = name + str('\\')
         self.log_dir_path = os.path.join(TENSORBOARD_LOGS_DIR, name)
 
-    def save(self, loss, accuracy, mse, step):
+    def save(self, scalar_name, scalar, step):
         self.create_log_dir()
         writer = tf.summary.create_file_writer(self.log_dir_path)
         with writer.as_default():
-            tf.summary.scalar(LOSS, loss, step=step)
-            tf.summary.scalar(ACCURACY, accuracy, step=step)
-            tf.summary.scalar(MSE, mse, step=step)
+            tf.summary.scalar(scalar_name, scalar, step=step)
         writer.flush()
 
     def save_confusion_matrix(self, step, confusion, class_names, episode):
