@@ -1,7 +1,22 @@
 from enum import Enum
-from sklearn import model_selection
-from Apstractions.DataPreprocessing.DataEncoders import *
+
 import numpy as np
+from sklearn import model_selection
+
+from Apstractions.DataPreprocessing.DataEncoders import *
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import FER_2013_PATH
+
+
+def sting_to_integer(s):
+    """
+    Konverzija na string vo integer
+    :param s: string
+    :return: integer
+    """
+    n = 0
+    for i in s:
+        n = n * 10 + ord(i) - ord("0")
+    return n
 
 
 class ResultType(Enum):
@@ -102,18 +117,65 @@ class Dataset:
         classes = np.asarray(classes).astype(np.float32)
         return features, classes
 
+    def complex_type_features(self):
+        """
+        :param data: data frame of the dataset
+        :return: size of feature with complex type
+        """
+        # for col in self.dataset_df.columns:
+        #     tmp = col[0]
+        #     if len(tmp) > 0:
+        #         tmp1 = tmp[0]
+        #         if len(tmp1) > 0:
+        #             return len(tmp), len(tmp1)
+        # return 0, 0
+        return 48, 48
+
+    def fer_dataset(self):
+        """helper function for image dataset"""
+
+        list_class_matrix = list()
+        for i in range(len(self.dataset_df)):
+            mat = np.zeros((48, 48), dtype=np.uint8)
+            txt = self.dataset_df['pixels'][i]
+            ex_class = self.dataset_df['emotion'][i]
+            # sekoj pixel kako string
+            words = txt.split()
+            # 2304 vrednosti vo sekoj red bidejki slikite se so dimanzii 48x48
+            for j in range(2304):
+                # floor division za dobivanja na indeksot x (redicata)
+                xind = j // 48
+                # module za dobivanje na indeksot y (kolonata)
+                yind = j % 48
+                # smestuvanje na vrednosta od nizata na soodvetno mesto vo matricata
+                mat[xind][yind] = sting_to_integer(words[j])
+            list_class_matrix.append((ex_class, mat.reshape((48, 48, 1))))
+        return list_class_matrix
+
+
+class ImageDataSet(Dataset):
+
+    def __init__(self, absolute_path, delimiter=","):
+        super(ImageDataSet, self).__init__(absolute_path, delimiter)
+        self.processed_data = self.fer_dataset()
+
+    def split_feature_classes_image(self, data, result_type=ResultType.ENCODED):
+        features = [elem[1] for elem in data]
+        classes = [elem[0] for elem in data]
+        classes = np.asarray(classes).astype(np.float32)
+        return features, classes
+
+    def split_data(self, result_type=ResultType.ENCODED, train_size=0.7, test_size=0.3):
+        process_data = self.processed_data
+        train_data = process_data[:int((100 - 30) / 100 * len(process_data))]
+        test_data = process_data[int((100 - 30) / 100 * len(process_data)):]
+
+        train_data_features, train_data_classes = self.split_feature_classes_image(data=train_data)
+        test_data_features, test_data_classes = self.split_feature_classes_image(data=test_data)
+        return train_data_features, train_data_classes, test_data_features, test_data_classes, train_data, test_data
+
 
 if __name__ == '__main__':
-    datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
-                  "Sitemi/datasets/car.csv "
-    dataset = Dataset(datasetPath)
-    print(f'Feature names ENCODED: {dataset.feature_names()}')
-    print(f'Feature names PLAIN: {dataset.feature_names(ResultType.PLAIN)}')
-    print(f'Number of features ENCODED: {dataset.number_of_features()}')
-    print(f'Number of features PLAIN: {dataset.number_of_features(ResultType.PLAIN)}')
-    print(f'Classes names ENCODED: {dataset.classes_names()}')
-    print(f'Classes names PLAIN: {dataset.classes_names(ResultType.PLAIN)}')
-    print(f'Number of classes ENCODED: {dataset.number_of_classes()}')
-    print(f'Number of classes PLAIN: {dataset.number_of_classes(ResultType.PLAIN)}')
-    train_f, train_c, test_f, test_c, train, test = dataset.split_data()
-    print("====================")
+    dataset = ImageDataSet(FER_2013_PATH)
+    train_data_features, train_data_classes, test_data_features, test_data_classes, train_data, test_data = dataset.split_data()
+    print()

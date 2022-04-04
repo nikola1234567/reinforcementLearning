@@ -10,5 +10,8 @@ PODOBRUVANJA
 -optimizator moze da se smeni (jana)
 -reinforce pocnuva od pocetok sekojpat?
 -vizuelizacii
+-imeto na files za train policy
+-ako acc dojde do 1 da se izgasi
 
 
+tensorboard --logdir=TensorBoardLogs/

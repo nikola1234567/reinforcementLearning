@@ -1,4 +1,4 @@
-import time
+from datetime import datetime
 
 import numpy as np
 from keras.layers import Dense, Input
@@ -10,7 +10,11 @@ from Apstractions.FileApstractions.FileWorker import FileWorker
 from Apstractions.KerasApstractions.KerasLogger import KerasLogger, PolicyWeightsNotFound
 from configurations import POLICY_LOGS_DIR, POLICY_EPOCH_TRACKER
 
-LOGS_NAME = 'policy_{}'.format(int(time.time()))
+
+def get_log_name():
+    current_datetime = datetime.now()
+    cd_string = current_datetime.strftime("%d_%m_%Y_%H_%M")
+    return 'policy_{}'.format(cd_string)
 
 
 def named_logs(model, logs):
@@ -35,7 +39,7 @@ class RLPolicyAgent:
         self.model = self.load_model()
         self.model.summary()
         self.epoch_id = self.get_epoch()
-        self.tensorBoardCallback = TensorBoard(log_dir='{}/{}'.format(POLICY_LOGS_DIR, LOGS_NAME),
+        self.tensorBoardCallback = TensorBoard(log_dir='{}/{}'.format(POLICY_LOGS_DIR, get_log_name()),
                                                histogram_freq=True,
                                                write_graph=True,
                                                write_grads=True)

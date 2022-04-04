@@ -1,9 +1,9 @@
 import numpy as np
-from gym import Env
-from Apstractions.KerasApstractions.KerasNetworkMetrics import NeuralNetworkMetrics
-from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
 import pandas as pd
+from gym import Env
+
 from Apstractions.DataPreprocessing.PandasApstractions import DataFrameWorker
+from Apstractions.KerasApstractions.KerasNetworkMetrics import NeuralNetworkMetrics
 
 REWARD_SERIES_KEY = "rewards during playing"
 NUMBER_OF_ACTIONS_EXECUTED_KEY = "taken actions"
@@ -11,8 +11,8 @@ NUMBER_OF_ACTIONS_EXECUTED_KEY = "taken actions"
 
 class NASEnvironment(Env):
 
-    def __init__(self, dataset_path, delimiter=","):
-        self.dataSet = Dataset(dataset_path, delimiter=delimiter)
+    def __init__(self, dataSet):
+        self.dataSet = dataSet
         self.rewards = []
 
     def step(self, action):

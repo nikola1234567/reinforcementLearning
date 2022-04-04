@@ -1,5 +1,5 @@
-from Apstractions.DatasetApstractions.DatasetApstractions import Dataset
-from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import POKEMON_DATASET_PATH
+from Apstractions.DatasetApstractions.DatasetApstractions import Dataset, ImageDataSet
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import FER_2013_PATH
 from GymEnviornments.NASEnvironment import NASEnvironment
 from NAS.Actions import Actions
 from NAS.Generator import Generator
@@ -20,16 +20,20 @@ def from_state_to_action(state):
 
 
 class Controller:
-    def __init__(self, dataset_path, dataset_delimiter=","):
+    def __init__(self, dataset_path, dataset_delimiter=",", dataset_image=False):
         super().__init__()
         self.dataset_path = dataset_path
-        self.dataSet = Dataset(self.dataset_path, delimiter=dataset_delimiter)
-        self.initial_state = State(self.dataSet.number_of_classes(), self.dataSet.number_of_features(), 1, 1, 0.0001)
+        if dataset_image:
+            self.dataSet = ImageDataSet(self.dataset_path, delimiter=dataset_delimiter)
+        else:
+            self.dataSet = Dataset(self.dataset_path, delimiter=dataset_delimiter)
+        self.initial_state = State(self.dataSet.number_of_classes(), self.dataSet.number_of_features(), 1, 1, 0.0001,
+                                   self.dataSet.complex_type_features())
         self.current_state = self.initial_state
         self.actions = from_state_to_action(self.initial_state)
         self.action_space = len(get_class_attributes(self.actions))
         self.generator = Generator()
-        self.nas_environment = NASEnvironment(dataset_path)
+        self.nas_environment = NASEnvironment(self.dataSet)
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)
         self.num_episodes = 1
         self.action_decoding_dict = self.create_action_dict()
@@ -80,6 +84,7 @@ class Controller:
             action_model = self.get_model()
             state, reward, done, info = self.nas_environment.step(action_model)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
+        print(info)
 
     def controller_preform(self):
         """preforms number of episodes and returns the best state
@@ -94,6 +99,6 @@ class Controller:
 
 
 if __name__ == '__main__':
-    controller = Controller(POKEMON_DATASET_PATH)
+    controller = Controller(dataset_path=FER_2013_PATH, dataset_image=True)
     model = controller.controller_preform()
     print(model)
