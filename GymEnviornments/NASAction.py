@@ -2,9 +2,10 @@
 
 class NASAction:
 
-    def __init__(self, state, network):
+    def __init__(self, state, network, episode_number):
         self.state = state
         self.network = network
+        self.episode_number = episode_number
 
     def number_of_layers(self):
         return self.state.num_layers
@@ -17,3 +18,6 @@ class NASAction:
 
     def neural_network_model(self):
         return self.network
+
+    def episode(self):
+        return self.episode_number

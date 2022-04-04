@@ -37,13 +37,15 @@ class NASEnvironment(Env):
                   y=train_c,
                   batch_size=10,
                   epochs=30,
-                  callbacks=[tensorboard_manager.callback(len(self.rewards) + 1)])
+                  callbacks=[tensorboard_manager.callback(iteration=len(self.rewards) + 1,
+                                                          episode=action.episode())])
         predictions = model.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
         self.log_confusion_matrix(manager=tensorboard_manager,
                                   y=rounded_classes,
-                                  y_predictions=rounded_predictions)
+                                  y_predictions=rounded_predictions,
+                                  episode=action.episode())
         reward = NeuralNetworkMetrics.accuracy(rounded_classes, rounded_predictions)
         self.log_hyper_parameters(manager=tensorboard_manager,
                                   number_of_layers=action.number_of_layers(),
@@ -69,14 +71,15 @@ class NASEnvironment(Env):
         df = pd.DataFrame(self.rewards)
         return DataFrameWorker.decreasing_or_constant(df)
 
-    def log_confusion_matrix(self, manager, y, y_predictions):
+    def log_confusion_matrix(self, manager, y, y_predictions, episode):
         class_names = self.dataSet.classes(result_type=ResultType.PLAIN)
         matrix = get_confusion_matrix(y_labels=y,
                                       predictions=y_predictions,
                                       class_names=class_names)
         manager.save_confusion_matrix(step=len(self.rewards) + 1,
                                       confusion=matrix,
-                                      class_names=class_names)
+                                      class_names=class_names,
+                                      episode=episode)
 
     @staticmethod
     def log_hyper_parameters(manager, number_of_layers, hidden_size, learning_rate, accuracy):

@@ -32,7 +32,7 @@ class Controller:
         self.generator = Generator()
         self.nas_environment = NASEnvironment(dataset_path)
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)
-        self.num_episodes = 1
+        self.num_episodes = 2
         self.action_decoding_dict = self.create_action_dict()
 
     def create_action_dict(self):
@@ -67,7 +67,7 @@ class Controller:
             self.current_state.__setattr__(attribute, previous_value + 1)
         self.actions = from_state_to_action(self.current_state)
 
-    def run_episode(self):
+    def run_episode(self, episode_number):
         """"runs one episode until the done flag from the environment is true
          -gets the next action and probability from the policy
          -implements the action in the current state
@@ -80,7 +80,8 @@ class Controller:
             self.implement_action(action)
             action_model = self.get_model()
             nas_action = NASAction(state=self.current_state,
-                                   network=action_model)
+                                   network=action_model,
+                                   episode_number=episode_number)
             state, reward, done, info = self.nas_environment.step(nas_action)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
 
@@ -88,7 +89,7 @@ class Controller:
         """preforms number of episodes and returns the best state
         :returns state"""
         for episode in range(self.num_episodes):
-            self.run_episode()
+            self.run_episode(episode_number=episode)
             self.controller_reset()
             self.policy.train()
 

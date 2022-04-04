@@ -1,7 +1,5 @@
 import keras.callbacks
 import tensorflow as tf
-import matplotlib.pyplot as plt
-import numpy as np
 from configurations import TENSORBOARD_LOGS_DIR
 from TensorBoard.utils import plot_confusion_matrix
 from tensorboard.plugins.hparams import api as hp
@@ -10,6 +8,18 @@ import os
 LOSS = "Loss"
 ACCURACY = "Accuracy"
 MSE = "Mean square error"
+
+
+def step_to_string(step):
+    return 'step_{}'.format(step)
+
+
+def episode_to_string(episode):
+    return 'episode_{}'.format(episode)
+
+
+def episode_step_to_confusion_matrix_step(episode, step):
+    return episode * 10 + step
 
 
 class TensorBoardCustomManager:
@@ -27,14 +37,15 @@ class TensorBoardCustomManager:
             tf.summary.scalar(MSE, mse, step=step)
         writer.flush()
 
-    def save_confusion_matrix(self, step, confusion, class_names):
+    def save_confusion_matrix(self, step, confusion, class_names, episode):
         path = self.create_inner_log_dir(step="confusionMatrix")
         writer = tf.summary.create_file_writer(logdir=path)
         with writer.as_default():
             tf.summary.image(
                 "Confusion Matrix",
                 plot_confusion_matrix(confusion, class_names),
-                step=step,
+                step=episode_step_to_confusion_matrix_step(episode=episode,
+                                                           step=step),
             )
 
     def save_hparams(self, number_of_layers, hidden_size, learning_rate, accuracy):
@@ -59,9 +70,19 @@ class TensorBoardCustomManager:
         if not os.path.exists(self.log_dir_path):
             os.mkdir(self.log_dir_path)
 
-    def create_inner_log_dir(self, step):
+    def create_inner_log_dir(self, step, episode=None):
+        episode_dir = self.create_episode_if_exists(episode=episode)
+        path = os.path.join(self.log_dir_path if episode_dir is None else episode_dir,
+                            step)
+        if not os.path.exists(path):
+            os.mkdir(path)
+        return path
+
+    def create_episode_if_exists(self, episode):
+        if episode is None:
+            return None
         self.create_log_dir()
-        path = os.path.join(self.log_dir_path, str(step))
+        path = os.path.join(self.log_dir_path, episode_to_string(episode))
         if not os.path.exists(path):
             os.mkdir(path)
         return path
@@ -84,7 +105,7 @@ class TensorBoardCustomManager:
 
 class TensorBoardStandardManager(TensorBoardCustomManager):
 
-    def callback(self, iteration):
-        path = self.create_inner_log_dir(step=iteration)
+    def callback(self, iteration, episode):
+        path = self.create_inner_log_dir(step=step_to_string(iteration), episode=episode)
         return keras.callbacks.TensorBoard(log_dir=path,
                                            profile_batch='500,520')
