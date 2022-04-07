@@ -135,7 +135,7 @@ class Dataset:
         """helper function for image dataset"""
 
         list_class_matrix = list()
-        for i in range(len(self.dataset_df)):
+        for i in range(1000):
             mat = np.zeros((48, 48), dtype=np.uint8)
             txt = self.dataset_df['pixels'][i]
             ex_class = self.dataset_df['emotion'][i]
@@ -149,7 +149,7 @@ class Dataset:
                 yind = j % 48
                 # smestuvanje na vrednosta od nizata na soodvetno mesto vo matricata
                 mat[xind][yind] = sting_to_integer(words[j])
-            list_class_matrix.append((ex_class, mat.reshape((48, 48, 1))))
+            list_class_matrix.append((ex_class, mat.reshape((48, 48))))
         return list_class_matrix
 
 
@@ -163,7 +163,11 @@ class ImageDataSet(Dataset):
         features = [elem[1] for elem in data]
         classes = [elem[0] for elem in data]
         classes = np.asarray(classes).astype(np.float32)
-        return features, classes
+        feature_array = np.array(features)
+        # TODO fix shape
+        feature_array.reshape(48, 48)
+
+        return feature_array, classes
 
     def split_data(self, result_type=ResultType.ENCODED, train_size=0.7, test_size=0.3):
         process_data = self.processed_data
