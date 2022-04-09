@@ -2,7 +2,7 @@ from enum import Enum
 
 import numpy as np
 from sklearn import model_selection
-
+from tensorflow.keras.utils import to_categorical
 from Apstractions.DataPreprocessing.DataEncoders import *
 from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import FER_2013_PATH
 
@@ -17,6 +17,10 @@ def sting_to_integer(s):
     for i in s:
         n = n * 10 + ord(i) - ord("0")
     return n
+
+def unique(list_array):
+    x = np.array(list_array)
+    return np.unique(x)
 
 
 class ResultType(Enum):
@@ -129,7 +133,7 @@ class Dataset:
         #         if len(tmp1) > 0:
         #             return len(tmp), len(tmp1)
         # return 0, 0
-        return 48, 48
+        return 48, 48, 1
 
     def fer_dataset(self):
         """helper function for image dataset"""
@@ -159,15 +163,18 @@ class ImageDataSet(Dataset):
         super(ImageDataSet, self).__init__(absolute_path, delimiter)
         self.processed_data = self.fer_dataset()
 
+    def classes_names(self, result_type=ResultType.ENCODED):
+        classes = [elem[0] for elem in self.processed_data]
+        return unique(classes)
+
     def split_feature_classes_image(self, data, result_type=ResultType.ENCODED):
         features = [elem[1] for elem in data]
         classes = [elem[0] for elem in data]
         classes = np.asarray(classes).astype(np.float32)
         feature_array = np.array(features)
-        # TODO fix shape
-        feature_array.reshape(48, 48)
-
-        return feature_array, classes
+        feature_array.reshape((len(features), 48, 48, 1))
+        encoded_classes = to_categorical(classes)
+        return feature_array, encoded_classes
 
     def split_data(self, result_type=ResultType.ENCODED, train_size=0.7, test_size=0.3):
         process_data = self.processed_data

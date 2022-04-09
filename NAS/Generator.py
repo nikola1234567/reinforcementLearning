@@ -1,6 +1,7 @@
 from keras.layers import Dense, Input, Dropout, Conv2D, MaxPool2D, Flatten
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
+import tensorflow as tf
 
 
 class Generator:
@@ -34,7 +35,8 @@ class Generator:
         conv_2d_param = 32
         model = Sequential()
         model.add(
-            Conv2D(conv_2d_param, (3, 3), activation='relu', input_shape=(state.conv_ize[0], state.conv_ize[1], 1)))
+            Conv2D(conv_2d_param, (3, 3), activation='relu', input_shape=state.input_shape()))
+        model.add(MaxPool2D(2, 2))
         for layer in range(num_layers - 1):
             conv_2d_param = conv_2d_param * 2
             model.add(Conv2D(conv_2d_param, (2, 2), activation='relu'))
@@ -44,3 +46,9 @@ class Generator:
         opt = Adam(learning_rate=0.001)
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy', 'mse'])
         return model
+
+
+if __name__ == '__main__':
+    input_shape = (4, 2, 2, 1)
+    X = tf.random.normal(input_shape)
+    print(X.shape)

@@ -11,6 +11,9 @@ class State:
     def executable_state(self):
         return [self.num_classes, self.num_features, self.num_layers, self.hidden_size, self.learning_rate]
 
+    def input_shape(self):
+        return self.conv_ize
+
     def __str__(self):
         return '\n====================================================\nNeural Network\n====================================================\nNumber of layers: {}\nHidden size: {}\nLearning rate: {}\nInput layer (Number of features): {}\nOutput layer (Number of classes): {}\n====================================================\n'.format(
             self.num_layers, self.hidden_size, self.learning_rate, self.num_features, self.num_classes)
