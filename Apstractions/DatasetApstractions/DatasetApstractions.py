@@ -5,6 +5,7 @@ from sklearn import model_selection
 from tensorflow.keras.utils import to_categorical
 from Apstractions.DataPreprocessing.DataEncoders import *
 from Apstractions.FileApstractions.FileWorker import FileWorker
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import *
 
 
 def sting_to_integer(s):
@@ -159,7 +160,7 @@ class ImageDataSet(Dataset):
         """helper function for image dataset"""
 
         list_class_matrix = list()
-        for i in range(1000):
+        for i in range(len(self.dataset_df)):
             mat = np.zeros((48, 48), dtype=np.uint8)
             txt = self.dataset_df['pixels'][i]
             ex_class = self.dataset_df['emotion'][i]
@@ -198,6 +199,11 @@ class ImageDataSet(Dataset):
         test_data_features, test_data_classes = self.split_feature_classes_image(data=test_data)
         return train_data_features, train_data_classes, test_data_features, test_data_classes, train_data, test_data
 
+    def classes(self, result_type=ResultType.ENCODED):
+        if result_type == ResultType.PLAIN:
+            return self.classes_names()
+        return to_categorical(self.classes_names())
+
 
 if __name__ == '__main__':
     datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
@@ -215,3 +221,7 @@ if __name__ == '__main__':
     print("====================")
     print(f'Classes unique ENCODED\n {dataset.classes()}')
     print(f'Classes unique PLAIN\n {dataset.classes(result_type=ResultType.PLAIN)}')
+
+    dataset = ImageDataSet(absolute_path=FER_2013_PATH)
+    print(dataset.classes())
+    print(dataset.classes(ResultType.PLAIN))
