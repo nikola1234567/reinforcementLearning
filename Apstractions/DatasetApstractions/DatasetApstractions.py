@@ -1,10 +1,10 @@
 from enum import Enum
-
 import numpy as np
+
 from sklearn import model_selection
 from tensorflow.keras.utils import to_categorical
 from Apstractions.DataPreprocessing.DataEncoders import *
-from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import FER_2013_PATH
+from Apstractions.FileApstractions.FileWorker import FileWorker
 
 
 def sting_to_integer(s):
@@ -17,6 +17,7 @@ def sting_to_integer(s):
     for i in s:
         n = n * 10 + ord(i) - ord("0")
     return n
+
 
 def unique(list_array):
     x = np.array(list_array)
@@ -121,6 +122,25 @@ class Dataset:
         classes = np.asarray(classes).astype(np.float32)
         return features, classes
 
+    def name(self):
+        return FileWorker.file_name(self.absolute_path)
+
+    def classes(self, result_type=ResultType.ENCODED):
+        classes = self.dataset(result_type=result_type) \
+            .groupby(self.classes_names(result_type=result_type)) \
+            .size() \
+            .reset_index() \
+            .rename(columns={0: 'count'})
+        classes = classes.drop('count', axis=1)
+        return DataFrameWorker.row_list(classes)
+
+
+class ImageDataSet(Dataset):
+
+    def __init__(self, absolute_path, delimiter=","):
+        super(ImageDataSet, self).__init__(absolute_path, delimiter)
+        self.processed_data = self.fer_dataset()
+
     def complex_type_features(self):
         """
         :param data: data frame of the dataset
@@ -156,13 +176,6 @@ class Dataset:
             list_class_matrix.append((ex_class, mat.reshape((48, 48))))
         return list_class_matrix
 
-
-class ImageDataSet(Dataset):
-
-    def __init__(self, absolute_path, delimiter=","):
-        super(ImageDataSet, self).__init__(absolute_path, delimiter)
-        self.processed_data = self.fer_dataset()
-
     def classes_names(self, result_type=ResultType.ENCODED):
         classes = [elem[0] for elem in self.processed_data]
         return unique(classes)
@@ -187,6 +200,18 @@ class ImageDataSet(Dataset):
 
 
 if __name__ == '__main__':
-    dataset = ImageDataSet(FER_2013_PATH)
-    train_data_features, train_data_classes, test_data_features, test_data_classes, train_data, test_data = dataset.split_data()
-    print()
+    datasetPath = "C:/Users/DELL/Desktop/documents/nikola-NEW/Inteligentni Informaciski " \
+                  "Sitemi/datasets/Car.csv "
+    dataset = Dataset(datasetPath)
+    print(f'Feature names ENCODED: {dataset.feature_names()}')
+    print(f'Feature names PLAIN: {dataset.feature_names(ResultType.PLAIN)}')
+    print(f'Number of features ENCODED: {dataset.number_of_features()}')
+    print(f'Number of features PLAIN: {dataset.number_of_features(ResultType.PLAIN)}')
+    print(f'Classes names ENCODED: {dataset.classes_names()}')
+    print(f'Classes names PLAIN: {dataset.classes_names(ResultType.PLAIN)}')
+    print(f'Number of classes ENCODED: {dataset.number_of_classes()}')
+    print(f'Number of classes PLAIN: {dataset.number_of_classes(ResultType.PLAIN)}')
+    train_f, train_c, test_f, test_c, train, test = dataset.split_data()
+    print("====================")
+    print(f'Classes unique ENCODED\n {dataset.classes()}')
+    print(f'Classes unique PLAIN\n {dataset.classes(result_type=ResultType.PLAIN)}')

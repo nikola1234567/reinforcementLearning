@@ -1,7 +1,5 @@
 import pandas as pd
 
-from Apstractions.FileApstractions.CSVApstractions import CSVFileHandler
-
 
 class DataFrameWorker:
 
@@ -56,6 +54,11 @@ class DataFrameWorker:
         if not increasing and not decreasing:
             return True
 
+    @staticmethod
+    def row_list(dataframe):
+        rows = [','.join(str(x) for x in elem) for elem in dataframe.values]
+        return rows
+
 
 if __name__ == '__main__':
     df = pd.DataFrame([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
@@ -64,3 +67,7 @@ if __name__ == '__main__':
     print(DataFrameWorker.decreasing_or_constant(df))
     df = pd.DataFrame([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     print(DataFrameWorker.decreasing_or_constant(df))
+    df = pd.DataFrame({'Date': ['10/2/2011', '11/2/2011', '12/2/2011', '13/2/11'],
+                       'Event': ['Music', 'Poetry', 'Theatre', 'Comedy'],
+                       'Cost': [10000, 5000, 15000, 2000]})
+    print(DataFrameWorker.row_list(df))

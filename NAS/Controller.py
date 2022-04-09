@@ -1,10 +1,17 @@
+import time
+
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset, ImageDataSet
-from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import FER_2013_PATH
-from GymEnviornments.NASEnvironment import NASEnvironment
+from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import *
+from GymEnviornments.NASEnvironment import NASEnvironment, NUMBER_OF_ACTIONS_EXECUTED_KEY
 from NAS.Actions import Actions
 from NAS.Generator import Generator
 from NAS.State import State
 from RLScripts.RLPolicyAgent import RLPolicyAgent
+from GymEnviornments.NASAction import NASAction
+from TensorBoard.TensorBoardCustomManager import TensorBoardCustomManager
+
+
+EPISODE_ITERATIONS = "episode_iteration"
 
 
 def get_class_attributes(class_object):
@@ -16,7 +23,9 @@ def get_class_attributes(class_object):
 def from_state_to_action(state):
     """help function for creating an action space from state
     :returns actions object"""
-    return Actions(num_layers=state.num_layers, hidden_size=state.hidden_size, learning_rate=state.learning_rate)
+    return Actions(num_layers=state.num_layers,
+                   hidden_size=state.hidden_size,
+                   learning_rate=state.learning_rate)
 
 
 class Controller:
@@ -27,7 +36,8 @@ class Controller:
             self.dataSet = ImageDataSet(self.dataset_path, delimiter=dataset_delimiter)
         else:
             self.dataSet = Dataset(self.dataset_path, delimiter=dataset_delimiter)
-        self.initial_state = State(self.dataSet.number_of_classes(), self.dataSet.number_of_features(), 1, 1, 0.0001,
+        self.initial_state = State(self.dataSet.number_of_classes(),
+                                   self.dataSet.number_of_features(), 1, 1, 0.0001,
                                    self.dataSet.complex_type_features())
         self.current_state = self.initial_state
         self.actions = from_state_to_action(self.initial_state)
@@ -35,8 +45,9 @@ class Controller:
         self.generator = Generator()
         self.nas_environment = NASEnvironment(self.dataSet)
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)
-        self.num_episodes = 1
+        self.num_episodes = 2
         self.action_decoding_dict = self.create_action_dict()
+        self.tensor_board_manager = TensorBoardCustomManager(name='ReinforceScalars')
 
     def create_action_dict(self):
         """:returns dict {action number:attribute name}"""
@@ -70,7 +81,7 @@ class Controller:
             self.current_state.__setattr__(attribute, previous_value + 1)
         self.actions = from_state_to_action(self.current_state)
 
-    def run_episode(self):
+    def run_episode(self, episode_number):
         """"runs one episode until the done flag from the environment is true
          -gets the next action and probability from the policy
          -implements the action in the current state
@@ -78,19 +89,25 @@ class Controller:
          -environment trains the model with current state and returns reward and done flag
          -policy updates """
         done = False
+        info = {}
         while not done:
             action, prob = self.policy.act(self.actions.executable_actions())
             self.implement_action(action)
             action_model = self.get_model()
-            state, reward, done, info = self.nas_environment.step(action_model)
+            nas_action = NASAction(state=self.current_state,
+                                   network=action_model,
+                                   episode_number=episode_number)
+            state, reward, done, info = self.nas_environment.step(nas_action)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
-        print(info)
+        self.tensor_board_manager.save(scalar_name=EPISODE_ITERATIONS,
+                                       scalar=info[NUMBER_OF_ACTIONS_EXECUTED_KEY],
+                                       step=int(time.time()))
 
     def controller_preform(self):
         """preforms number of episodes and returns the best state
         :returns state"""
         for episode in range(self.num_episodes):
-            self.run_episode()
+            self.run_episode(episode_number=episode)
             self.controller_reset()
             self.policy.train()
 
