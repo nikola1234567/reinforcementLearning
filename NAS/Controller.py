@@ -116,6 +116,6 @@ class Controller:
 
 
 if __name__ == '__main__':
-    controller = Controller(dataset_path=CAR_DATASET_PATH)
+    controller = Controller(dataset_path=FER_2013_PATH, dataset_image=True)
     model = controller.controller_preform()
     print(model)
