@@ -1,9 +1,9 @@
 import numpy as np
-from gym import Env
 import pandas as pd
+from gym import Env
 
-from Apstractions.DatasetApstractions.DatasetApstractions import Dataset, ResultType
 from Apstractions.DataPreprocessing.PandasApstractions import DataFrameWorker
+from Apstractions.DatasetApstractions.DatasetApstractions import ResultType
 from Apstractions.KerasApstractions.KerasNetworkMetrics import NeuralNetworkMetrics
 from TensorBoard.TensorBoardCustomManager import TensorBoardStandardManager
 from TensorBoard.utils import get_confusion_matrix
@@ -69,7 +69,7 @@ class NASEnvironment(Env):
 
     def is_done(self):
         df = pd.DataFrame(self.rewards)
-        return DataFrameWorker.decreasing_or_constant(df)
+        return self.rewards[-1] == 1 or DataFrameWorker.decreasing_or_constant(df)
 
     def log_confusion_matrix(self, manager, y, y_predictions, episode):
         class_names = self.dataSet.classes(result_type=ResultType.PLAIN)

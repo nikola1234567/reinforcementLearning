@@ -1,7 +1,7 @@
+import tensorflow as tf
 from keras.layers import Dense, Input, Dropout, Conv2D, MaxPool2D, Flatten
 from keras.models import Sequential
 from tensorflow.keras.optimizers import Adam
-import tensorflow as tf
 
 
 class Generator:
@@ -23,7 +23,7 @@ class Generator:
         if num_layers > 6:
             model.add(Dropout(0.25))
         model.add(Dense(state.num_classes, activation='softmax'))
-        opt = Adam(learning_rate=0.001)
+        opt = Adam(learning_rate=state.learning_rate)
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy', 'mse'])
         return model
 
@@ -43,7 +43,7 @@ class Generator:
             model.add(MaxPool2D(2, 2))
         model.add(Flatten())
         model.add(Dense(state.num_classes, activation='softmax'))
-        opt = Adam(learning_rate=0.001)
+        opt = Adam(learning_rate=state.learning_rate)
         model.compile(loss='categorical_crossentropy', optimizer=opt, metrics=['accuracy', 'mse'])
         return model
 
