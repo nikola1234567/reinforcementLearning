@@ -67,3 +67,16 @@ def plot_confusion_matrix(cm, class_names):
 
     cm_image = plot_to_image(figure)
     return cm_image
+
+
+def step_to_string(step):
+    return 'step_{}'.format(step)
+
+
+def episode_to_string(episode):
+    return 'episode_{}'.format(episode)
+
+
+def episode_step_to_confusion_matrix_step(episode, step):
+    step = int('{}0{}'.format(episode, step))
+    return step

@@ -135,6 +135,13 @@ class Dataset:
         classes = classes.drop('count', axis=1)
         return DataFrameWorker.row_list(classes)
 
+    def complex_type_features(self):
+        """
+        :param data: data frame of the dataset
+        :return: size of feature with complex type
+        """
+        return None
+
 
 class ImageDataSet(Dataset):
 

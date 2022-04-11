@@ -11,7 +11,7 @@ class Generator:
     def model_from_state(self, state):
         """:param state - object from class State
         :returns sequential keras model"""
-        if state.conv_ize != (0, 0):
+        if state.conv_ize is not None and state.conv_ize != (0, 0):
             return self.model_conv_from_state(state)
 
         num_layers = state.num_layers

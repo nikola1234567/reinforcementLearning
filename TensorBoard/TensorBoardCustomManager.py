@@ -1,21 +1,9 @@
 import keras.callbacks
 import tensorflow as tf
 from configurations import TENSORBOARD_LOGS_DIR
-from TensorBoard.utils import plot_confusion_matrix
+from TensorBoard.utils import *
 from tensorboard.plugins.hparams import api as hp
 import os
-
-
-def step_to_string(step):
-    return 'step_{}'.format(step)
-
-
-def episode_to_string(episode):
-    return 'episode_{}'.format(episode)
-
-
-def episode_step_to_confusion_matrix_step(episode, step):
-    return episode * 10 + step
 
 
 class TensorBoardCustomManager:
@@ -102,4 +90,5 @@ class TensorBoardStandardManager(TensorBoardCustomManager):
     def callback(self, iteration, episode):
         path = self.create_inner_log_dir(step=step_to_string(iteration), episode=episode)
         return keras.callbacks.TensorBoard(log_dir=path,
+                                           histogram_freq=True,
                                            profile_batch='500,520')
