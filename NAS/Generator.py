@@ -10,7 +10,8 @@ class Generator:
 
     def model_from_state(self, state):
         """:param state - object from class State
-        :returns sequential keras model"""
+        Method generating a feed froward sequential neural network with the parameter from the state
+        :return sequential keras model"""
         if state.conv_ize is not None and state.conv_ize != (0, 0):
             return self.model_conv_from_state(state)
 
@@ -29,7 +30,8 @@ class Generator:
 
     def model_conv_from_state(self, state):
         """:param state - object from class State
-        :returns sequential keras model"""
+         Method generating a convolutional neural network with the parameter from the state
+        :return sequential keras model"""
 
         num_layers = state.num_layers
         conv_2d_param = 32

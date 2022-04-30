@@ -1,13 +1,60 @@
 # Neural Architecture Search with Deep Reinforcement Learning
 
+## State
+
+A state is represented by a set of parameters for the neural network, to create a neural network suitable for the given
+dataset. The parameters included in the state are state(num_classes, num_features, num_layers, hidden_size,
+learning_rate, conv_size)
+
+## Action
+
+The actions in our project are represented as a set of changeable parameters for the neural network. The representation
+is like the state, but the actions are constructed just of the parameters that can be changed and the performance is
+dependent on them in the neural network. Every next possible action has a change in just one of the parameters from the
+previous, consequently the number of the next possible actions from a current state is the number of parameters in the
+action.
+
+## Generator
+
+The generator is providing the neural network models contracted by the current state updated in the current action.
+Depending on the scale of the dataset and its features the generator provides a suitable model whose performance is
+rewarded by the success of the training phase. The generator has two methods generating models one that generates feed
+forward neural networks and the other one generates convolutional neural networks.
+
+```sh
+    def model_from_state(self, state):
+    """
+        Method generating a feed froward sequential neural network with the parameter from the state
+        :param state - object from class State
+        :return sequential keras model
+    """
+    
+     def model_conv_from_state(self, state):
+        """
+        Method generating a convolutional neural network with the parameter from the state
+        :param state - object from class State
+        :return sequential keras model
+        """
+
+
+```
+
+## Controller
+
+The controller is the main part in which all the steps are taken and the logic is implemented. All parts of the
+application are coming together and eventually communicating through its actions. Firstly, the controller uses all the
+other classes to initialize its initial class parameters and
+
 ## Data preprocessing
 
-So far the project only works with standard datasets and image datasets. We created class abstractions in order to process datasets.
-In the file `DatasetApstractions` there's a class called `Dataset` which only serves to process **standard datasets** i.e. dataset in
-CSV format, which only consists of plain features and target class (whether is multiple columns or not). Only input parametrs are the 
-absolute path to where the dataset is stored, as well as the delimiter used in the CSV file. A requirement for our `Dataset` class to
-works is that every column in the dataset should be prefixed with `class_<column-name>` (ex. class_humidity), in order to recognize them
-when working with them. Then for every dataset we have several methods out of the box:
+So far the project only works with standard datasets and image datasets. We created class abstractions in order to
+process datasets. In the file `DatasetApstractions` there's a class called `Dataset` which only serves to process **
+standard datasets** i.e. dataset in CSV format, which only consists of plain features and target class (whether is
+multiple columns or not). Only input parametrs are the absolute path to where the dataset is stored, as well as the
+delimiter used in the CSV file. A requirement for our `Dataset` class to works is that every column in the dataset
+should be prefixed with `class_<column-name>` (ex. class_humidity), in order to recognize them when working with them.
+Then for every dataset we have several methods out of the box:
+
 ```sh
     def number_of_features(self, result_type=ResultType.ENCODED)
 	"""
