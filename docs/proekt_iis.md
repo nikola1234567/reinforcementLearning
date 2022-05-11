@@ -1,5 +1,23 @@
 # Neural Architecture Search with Deep Reinforcement Learning
 
+## Motivation
+
+## REINFORCE Algorithm
+
+As previously stated the core of this project is to show the power of reinforcement learning, more specifically deep
+reinforcement learning. That is a combination of the most currently relevant AI fields which are Deep Learning and
+Reinforcement learning. Deep learning is one of the most useful tools because it can quicly adapt to every kind of problem
+nature, from most complex to most simple, as long as large amount of data is given to them, so they can learn, whilst other
+ML learning models can behave well only in certain environments, under certain conditions. However, from there we can deduct
+a crucial point when using neural networks. That is no matter how good they are  and how fast they adapt, that is only possible
+if large amount of data is given.
+
+The deep reinforcement learning field basically can be divided in two types of algorithms, and those are `policy-based` and
+`policy-gradient` methods. 
+
+![deep reinforcement learning algorithms](./images/REINFORCE/deep-reinforcement-learning-algorithms.png
+)
+
 ## State
 
 A state is represented by a set of parameters for the neural network, to create a neural network suitable for the given
