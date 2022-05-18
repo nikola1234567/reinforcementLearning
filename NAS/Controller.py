@@ -1,8 +1,10 @@
 import time
+import pandas as pd
 
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset, ImageDataSet
 from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import *
 from GymEnviornments.NASEnvironment import NASEnvironment, NUMBER_OF_ACTIONS_EXECUTED_KEY
+from Apstractions.DataPreprocessing.PandasApstractions import DataFrameWorker
 from NAS.Actions import Actions
 from NAS.Generator import Generator
 from NAS.State import State
@@ -10,8 +12,8 @@ from RLScripts.RLPolicyAgent import RLPolicyAgent
 from GymEnviornments.NASAction import NASAction
 from TensorBoard.TensorBoardCustomManager import TensorBoardCustomManager
 
-
 EPISODE_ITERATIONS = "episode_iteration"
+EPISODE = "number_of_episodes"
 
 
 def get_class_attributes(class_object):
@@ -45,8 +47,9 @@ class Controller:
         self.generator = Generator()
         self.nas_environment = NASEnvironment(self.dataSet)
         self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)
-        self.num_episodes = 2
+        self.num_episodes = 4
         self.action_decoding_dict = self.create_action_dict()
+        self.accuracies = [0.0]
         self.tensor_board_manager = TensorBoardCustomManager(name='ReinforceScalars')
 
     def create_action_dict(self):
@@ -90,6 +93,7 @@ class Controller:
          -policy updates """
         done = False
         info = {}
+        return_reward = 0
         while not done:
             action, prob = self.policy.act(self.actions.executable_actions())
             self.implement_action(action)
@@ -99,23 +103,41 @@ class Controller:
                                    episode_number=episode_number)
             state, reward, done, info = self.nas_environment.step(nas_action)
             self.policy.memorize(self.actions.executable_actions(), action, prob, reward)
+            return_reward = reward
         self.tensor_board_manager.save(scalar_name=EPISODE_ITERATIONS,
                                        scalar=info[NUMBER_OF_ACTIONS_EXECUTED_KEY],
                                        step=int(time.time()))
+        return return_reward
+
+    def not_satisfies_accuracy_stop_constraint(self):
+        last_accuracy = self.accuracies[-1]
+        accuracy_is_not_least_satisfying_accuracy_constraint = last_accuracy < 0.7
+        decreasing_or_constant_accuracy = DataFrameWorker.decreasing_or_constant(pd.DataFrame(self.accuracies))
+        total_accuracy = last_accuracy == 1
+        last_two_accuracies_decreasing = len(self.accuracies) >= 3 and (decreasing_or_constant_accuracy or total_accuracy)
+        accuracy_does_not_starts_decreasing_constraint = last_accuracy >= 0.7 and not last_two_accuracies_decreasing
+        return accuracy_is_not_least_satisfying_accuracy_constraint or accuracy_does_not_starts_decreasing_constraint
 
     def controller_preform(self):
         """preforms number of episodes and returns the best state
         :returns state"""
-        for episode in range(self.num_episodes):
-            self.run_episode(episode_number=episode)
+
+        number_of_episodes = 0
+        while self.not_satisfies_accuracy_stop_constraint():
+            episode_accuracy = self.run_episode(episode_number=number_of_episodes)
+            self.accuracies.append(episode_accuracy)
             self.controller_reset()
             self.policy.train()
+            number_of_episodes += 1
+        self.tensor_board_manager.save(scalar_name=EPISODE,
+                                       scalar=number_of_episodes,
+                                       step=int(time.time()))
 
         self.policy.memorize_network(self.dataset_path)
         return self.current_state
 
 
 if __name__ == '__main__':
-    controller = Controller(dataset_path=FER_2013_PATH, dataset_image=True)
+    controller = Controller(dataset_path=POKEMON_DATASET_PATH)
     model = controller.controller_preform()
     print(model)

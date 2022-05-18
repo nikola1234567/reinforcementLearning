@@ -5,7 +5,7 @@ class CSVFileHandler:
 
     def __init__(self, file_path, delimiter=","):
         self.filePath = file_path
-        self.file_dataframe = pd.read_csv(file_path, delimiter=delimiter)
+        self.file_dataframe = pd.read_csv(file_path, delimiter=delimiter, keep_default_na=False)
 
     def df(self):
         return self.file_dataframe
