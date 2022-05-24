@@ -69,7 +69,7 @@ class NASEnvironment(Env):
 
     def is_done(self):
         df = pd.DataFrame(self.rewards)
-        return len(self.rewards) > 3 and (self.rewards[-1] == 1 or DataFrameWorker.decreasing_or_constant(df))
+        return self.rewards[-1] == 1 or DataFrameWorker.decreasing_or_constant(df)
 
     def log_confusion_matrix(self, manager, y, y_predictions, episode):
         class_names = self.dataSet.classes(result_type=ResultType.PLAIN)
