@@ -5,13 +5,12 @@ VIZUELIZACII
 
 PODOBRUVANJA
 -------------------------------------------
-- da se vovede pamtenje na broj na epizodi vo odnos na dataset
--podobruvanje na modeli za conv sloevi(jana)
--optimizator moze da se smeni (jana)
--reinforce pocnuva od pocetok sekojpat?
--vizuelizacii
--imeto na files za train policy
--ako acc dojde do 1 da se izgasi
+
 
 
 tensorboard --logdir=TensorBoardLogs/
+
+-broj na epizodi
+-done da se sredi
+-da e podobri image dataet za da se vnesuvaat i sliki
+-transfer

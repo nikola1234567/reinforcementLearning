@@ -42,8 +42,51 @@ forward neural networks and the other one generates convolutional neural network
 ## Controller
 
 The controller is the main part in which all the steps are taken and the logic is implemented. All parts of the
-application are coming together and eventually communicating through its actions. Firstly, the controller uses all the
-other classes to initialize its initial class parameters and
+application are coming together and eventually communicating through its actions. During the initialization the values
+for the initial state are given and the parameters for the reinforcement algorithm, also the dataset processing is
+called and the processed dataset is used as a class parameter.
+
+```shell
+  def __init__(self, dataset_path, dataset_delimiter=",", dataset_image=False):
+            super().__init__()
+            self.dataset_path = dataset_path
+            if dataset_image:
+                self.dataSet = ImageDataSet(self.dataset_path, delimiter=dataset_delimiter)
+            else:
+                self.dataSet = Dataset(self.dataset_path, delimiter=dataset_delimiter)
+            self.initial_state = State(self.dataSet.number_of_classes(),
+                                       self.dataSet.number_of_features(), 1, 1, 0.0001,
+                                       self.dataSet.complex_type_features())
+            self.current_state = self.initial_state
+            self.actions = from_state_to_action(self.initial_state)
+            self.action_space = len(get_class_attributes(self.actions))
+            self.generator = Generator()
+            self.nas_environment = NASEnvironment(self.dataSet)
+            self.policy = RLPolicyAgent(len(get_class_attributes(self.actions)), self.action_space)
+            self.num_episodes = 2
+            self.action_decoding_dict = self.create_action_dict()
+            self.tensor_board_manager = TensorBoardCustomManager(name='ReinforceScalars')
+
+```
+
+All the methods and logic are implemented in the perform method, after initializing the controller the perform method is
+called.
+
+```shell
+ def controller_preform(self):
+        """
+        Main function in the class calls all the methods in the class. 
+        Preforms number of episodes and returns the best state.
+        Makes call for the following methods: 
+        - run_episode
+        - controller_reset
+        -policy train
+        -policy memorize
+        :return state
+        """
+       
+  
+```
 
 ## Data preprocessing
 
