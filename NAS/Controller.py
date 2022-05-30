@@ -10,7 +10,6 @@ from RLScripts.RLPolicyAgent import RLPolicyAgent
 from GymEnviornments.NASAction import NASAction
 from TensorBoard.TensorBoardCustomManager import TensorBoardCustomManager
 
-
 EPISODE_ITERATIONS = "episode_iteration"
 
 
@@ -112,10 +111,9 @@ class Controller:
             self.policy.train()
 
         self.policy.memorize_network(self.dataset_path)
-        return self.current_state
+        print("END END END END END\nEND END END END END\nEND END END END END\nEND END END END END\nEND END END END END\n")
 
 
 if __name__ == '__main__':
-    controller = Controller(dataset_path=FER_2013_PATH, dataset_image=True)
-    model = controller.controller_preform()
-    print(model)
+    controller = Controller(dataset_path=POKEMON_DATASET_PATH)
+    controller.controller_preform()

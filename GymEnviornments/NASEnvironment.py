@@ -7,6 +7,8 @@ from Apstractions.DatasetApstractions.DatasetApstractions import ResultType
 from Apstractions.KerasApstractions.KerasNetworkMetrics import NeuralNetworkMetrics
 from TensorBoard.TensorBoardCustomManager import TensorBoardStandardManager
 from TensorBoard.utils import get_confusion_matrix
+from Apstractions.FileApstractions.NotepadHandler import NotepadHandler
+from Apstractions.FileApstractions.CSVApstractions import csv_logger_callback
 
 REWARD_SERIES_KEY = "rewards during playing"
 NUMBER_OF_ACTIONS_EXECUTED_KEY = "taken actions"
@@ -17,6 +19,8 @@ class NASEnvironment(Env):
     def __init__(self, dataSet):
         self.dataSet = dataSet
         self.rewards = []
+        self.losses_rate_pairs = []
+        self.logger = NotepadHandler(dataset_name=dataSet.name(), optional_description="Test try")
 
     def step(self, action):
         """
@@ -33,12 +37,17 @@ class NASEnvironment(Env):
         model = action.neural_network_model()
         tensorboard_manager = TensorBoardStandardManager(name=self.dataSet.name())
         train_f, train_c, test_f, test_c, train, test = self.dataSet.split_data()
-        model.fit(x=train_f,
-                  y=train_c,
-                  batch_size=10,
-                  epochs=30,
-                  callbacks=[tensorboard_manager.callback(iteration=len(self.rewards) + 1,
-                                                          episode=action.episode())])
+        fit_results = model.fit(x=train_f,
+                                y=train_c,
+                                batch_size=10,
+                                epochs=30,
+                                callbacks=[tensorboard_manager.callback(iteration=len(self.rewards) + 1,
+                                                                        episode=action.episode()),
+                                           csv_logger_callback(dataset_name=self.dataSet.name())],
+                                verbose=0)
+        loss_rate_pair = {"loss": fit_results.history['loss'][-1],
+                          "learning_rate": action.state.learning_rate}
+        self.losses_rate_pairs.append(loss_rate_pair)
         predictions = model.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
@@ -55,6 +64,8 @@ class NASEnvironment(Env):
         self.rewards.append(reward)
         state = action
         done = self.is_done()
+        if done:
+            self.print_loss_report(episode_number=action.episode())
         info = {REWARD_SERIES_KEY: self.rewards,
                 NUMBER_OF_ACTIONS_EXECUTED_KEY: len(self.rewards)}
         return state, reward, done, info
@@ -80,6 +91,17 @@ class NASEnvironment(Env):
                                       confusion=matrix,
                                       class_names=class_names,
                                       episode=episode)
+
+    def print_loss_report(self, episode_number):
+        content = ""
+        title = 'Episode {} LOSS-LEARNING RATE Report'.format(episode_number)
+        for l_r_pair in self.losses_rate_pairs:
+            one_pair_log = 'Learning rate: {} ------> Loss: {}'.format(l_r_pair['learning_rate'],
+                                                                       l_r_pair['loss'])
+            separator = "-------------------------------------------------"
+            one_pair_content = "".join((one_pair_log, "\n", separator, "\n"))
+            content = "".join((content, one_pair_content))
+        self.logger.write(content=content, content_title=title)
 
     @staticmethod
     def log_hyper_parameters(manager, number_of_layers, hidden_size, learning_rate, accuracy):
