@@ -17,6 +17,8 @@ class NASEnvironment(Env):
     def __init__(self, dataSet):
         self.dataSet = dataSet
         self.rewards = []
+        self.loss = []
+        self.loss_dic = {}
 
     def step(self, action):
         """
@@ -33,13 +35,14 @@ class NASEnvironment(Env):
         model = action.neural_network_model()
         tensorboard_manager = TensorBoardStandardManager(name=self.dataSet.name())
         train_f, train_c, test_f, test_c, train, test = self.dataSet.split_data()
-        model.fit(x=train_f,
-                  y=train_c,
-                  batch_size=10,
-                  epochs=30,
-                  callbacks=[tensorboard_manager.callback(iteration=len(self.rewards) + 1,
-                                                          episode=action.episode())])
+        fit_results = model.fit(x=train_f,
+                                y=train_c,
+                                batch_size=10,
+                                epochs=30,
+                                callbacks=[tensorboard_manager.callback(iteration=len(self.rewards) + 1,
+                                                                        episode=action.episode())])
         predictions = model.predict(x=test_f, batch_size=10, verbose=0)
+        self.loss.append(fit_results.history['loss'][-1])
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
         self.log_confusion_matrix(manager=tensorboard_manager,
@@ -87,3 +90,6 @@ class NASEnvironment(Env):
                              hidden_size=hidden_size,
                              learning_rate=learning_rate,
                              accuracy=accuracy)
+
+    def loss_threshold_calculation(self, learning_rate):
+        return

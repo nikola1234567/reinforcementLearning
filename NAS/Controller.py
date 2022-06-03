@@ -2,14 +2,13 @@ import time
 
 from Apstractions.DatasetApstractions.DatasetApstractions import Dataset, ImageDataSet
 from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import *
+from GymEnviornments.NASAction import NASAction
 from GymEnviornments.NASEnvironment import NASEnvironment, NUMBER_OF_ACTIONS_EXECUTED_KEY
 from NAS.Actions import Actions
 from NAS.Generator import Generator
 from NAS.State import State
 from RLScripts.RLPolicyAgent import RLPolicyAgent
-from GymEnviornments.NASAction import NASAction
 from TensorBoard.TensorBoardCustomManager import TensorBoardCustomManager
-
 
 EPISODE_ITERATIONS = "episode_iteration"
 
@@ -116,6 +115,6 @@ class Controller:
 
 
 if __name__ == '__main__':
-    controller = Controller(dataset_path=FER_2013_PATH, dataset_image=True)
+    controller = Controller(dataset_path=CAR_DATASET_PATH, dataset_image=False)
     model = controller.controller_preform()
     print(model)
