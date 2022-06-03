@@ -19,8 +19,8 @@ class NASEnvironment(Env):
     def __init__(self, dataSet):
         self.dataSet = dataSet
         self.rewards = []
-        self.losses_rate_pairs = []
-        self.logger = NotepadHandler(dataset_name=dataSet.name(), optional_description="Test try")
+        self.losses_rate_rewards_pairs = []
+        self.logger = NotepadHandler(dataset_name=dataSet.name(), optional_description="")
 
     def step(self, action):
         """
@@ -45,9 +45,6 @@ class NASEnvironment(Env):
                                                                         episode=action.episode()),
                                            csv_logger_callback(dataset_name=self.dataSet.name())],
                                 verbose=0)
-        loss_rate_pair = {"loss": fit_results.history['loss'][-1],
-                          "learning_rate": action.state.learning_rate}
-        self.losses_rate_pairs.append(loss_rate_pair)
         predictions = model.predict(x=test_f, batch_size=10, verbose=0)
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
@@ -62,6 +59,10 @@ class NASEnvironment(Env):
                                   learning_rate=action.learning_rate(),
                                   accuracy=reward)
         self.rewards.append(reward)
+        loss_rate_pair = {"loss": fit_results.history['loss'][-1],
+                          "learning_rate": action.state.learning_rate,
+                          "reward": reward}
+        self.losses_rate_rewards_pairs.append(loss_rate_pair)
         state = action
         done = self.is_done()
         if done:
@@ -95,10 +96,11 @@ class NASEnvironment(Env):
     def print_loss_report(self, episode_number):
         content = ""
         title = 'Episode {} LOSS-LEARNING RATE Report'.format(episode_number)
-        for l_r_pair in self.losses_rate_pairs:
-            one_pair_log = 'Learning rate: {} ------> Loss: {}'.format(l_r_pair['learning_rate'],
-                                                                       l_r_pair['loss'])
-            separator = "-------------------------------------------------"
+        for l_r_r_pair in self.losses_rate_rewards_pairs:
+            one_pair_log = 'Learning rate: {} ------> Loss: {} ------> Reward: {}'.format(l_r_r_pair['learning_rate'],
+                                                                                          l_r_r_pair['loss'],
+                                                                                          l_r_r_pair['reward'])
+            separator = "---------------------------------------------------------------------"
             one_pair_content = "".join((one_pair_log, "\n", separator, "\n"))
             content = "".join((content, one_pair_content))
         self.logger.write(content=content, content_title=title)

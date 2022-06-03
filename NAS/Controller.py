@@ -115,5 +115,5 @@ class Controller:
 
 
 if __name__ == '__main__':
-    controller = Controller(dataset_path=POKEMON_DATASET_PATH)
+    controller = Controller(dataset_path=CAR_DATASET_PATH)
     controller.controller_preform()
