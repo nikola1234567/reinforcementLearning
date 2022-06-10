@@ -13,16 +13,58 @@ a crucial point when using neural networks. That is no matter how good they are 
 if large amount of data is given.
 
 The deep reinforcement learning field basically can be divided in two types of algorithms, and those are `policy-based` and
-`policy-gradient` methods. 
+`value-gradient` methods.
 
 ![deep reinforcement learning algorithms](./images/REINFORCE/deep-reinforcement-learning-algorithms.png
 )
 
-## State
+Every RL based type of learning has only one goal, and that is to maximize the "expected" reward throughout the learning process. However,
+the difference in all the algorithm 
+
+
+## 3. Problem formalization
+
+The core idea of our project is to automate the neural network design process, regardless the nature of the problem for which the proposed
+network model will be used for. Since we decided to propose a solution with the use of deep reinforcement learning the problem needs to be 
+modeled as a MDP(Markov Decision Process) problem. But before we even model it as that, we needed to make sure that the problem satisfies 
+the conditions to be considered as a MDP problem. Generally there are two conditions:
+    - The `Markov property`
+    - The `Markov process`
+
+
+###  3.1. State
 
 A state is represented by a set of parameters for the neural network, to create a neural network suitable for the given
-dataset. The parameters included in the state are state(num_classes, num_features, num_layers, hidden_size,
-learning_rate, conv_size)
+dataset. We keep track of more parameters and those are:
+    - **number of classes** - This parameter as strictly derived from the dataset it is currently the object of observing
+                              Considering we are only taking care of classification problem. this would be the number of target
+                              classes in the dataset itself.
+    - **number of features** - This parameter like the previous as well can be derived from dataset i.e. the number of attributes
+                               we can learn from.
+    - **number of layers** - Considering the state reflects the current neural network model which is proposed as a solution for
+                             evaluation, this property represents the number of layers in it. This is not a static property like 
+                             the previous two properties which are ones initialized and stay the same. This is directly influenced
+                             by the actions(described in next section), which are supposed to modify the neural network.
+    - **hidden size** - The hidden size reflects the number of neurons in each layer of the proposed neural network. This likewise the
+                        `numbe of layers` and because of the same reasons it's not a static property and changes overtime.
+    - **learning rate** - This is the well-know and crucial hyperparameter of each neural networks, which while training controls 
+                          how much to change the model in response to the estimated error each time the model weights are updated.
+    - **convolutional size** - This is a special type of property and it's only useful when working with image datasets. This parameter
+                               reflects the image size (width x height) in pixels. It is store as tuple of two values (width, height).
+
+Furthermore, from a programing point of view it is represented as a class with five attributes reflecting the mentioned ones:
+
+```python
+class State:
+    def __init__(self, num_classes, num_features, num_layers, hidden_size, learning_rate, conv_size):
+        super().__init__()
+        self.num_layers = num_layers
+        self.num_classes = num_classes
+        self.num_features = num_features
+        self.hidden_size = hidden_size
+        self.learning_rate = learning_rate
+        self.conv_ize = conv_size
+```
 
 ## Action
 
