@@ -28,6 +28,7 @@ The core idea of our project is to automate the neural network design process, r
 network model will be used for. Since we decided to propose a solution with the use of deep reinforcement learning the problem needs to be 
 modeled as a MDP(Markov Decision Process) problem. But before we even model it as that, we needed to make sure that the problem satisfies 
 the conditions to be considered as a MDP problem. Generally there are two conditions:
+
     - The `Markov property`
     - The `Markov process`
 
@@ -37,14 +38,14 @@ the conditions to be considered as a MDP problem. Generally there are two condit
 A state is represented by a set of parameters for the neural network, to create a neural network suitable for the given
 dataset. We keep track of more parameters and those are:
 
-| Parameter | Description |
-| --------- | ----------- |
-| **number of classes** | This parameter as strictly derived from the dataset it is currently the object of observing. Considering we are only taking care of classification problem. this would be the number of target classes in the dataset itself.|
-| **number of features** | This parameter like the previous as well can be derived from dataset i.e. the number of attributes we can learn from.|
-| **number of layers** | Considering the state reflects the current neural network model which is proposed as a solution for evaluation, this property represents the number of layers in it. This is not a static property like the previous two properties which are ones initialized and stay the same. This is directly influenced by the actions(described in next section), which are supposed to modify the neural network.|
-| **hidden size** | The hidden size reflects the number of neurons in each layer of the proposed neural network. This likewise the `numbe of layers` and because of the same reasons it's not a static property and changes overtime.|
-| **learning rate** | This is the well-know and crucial hyperparameter of each neural networks, which while training controls how much to change the model in response to the estimated error each time the model weights are updated. |
-| **convolutional size** | This is a special type of property, and it's only useful when working with image datasets. This parameter reflects the image size (width x height) in pixels. It is store as tuple of two values (width, height).|
+| Parameter              | Description                                                                                                                                                                                                                                                                                                                                                                                               |
+|------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **number of classes**  | This parameter as strictly derived from the dataset it is currently the object of observing. Considering we are only taking care of classification problem. this would be the number of target classes in the dataset itself.                                                                                                                                                                             |
+| **number of features** | This parameter like the previous as well can be derived from dataset i.e. the number of attributes we can learn from.                                                                                                                                                                                                                                                                                     |
+| **number of layers**   | Considering the state reflects the current neural network model which is proposed as a solution for evaluation, this property represents the number of layers in it. This is not a static property like the previous two properties which are ones initialized and stay the same. This is directly influenced by the actions(described in next section), which are supposed to modify the neural network. |
+| **hidden size**        | The hidden size reflects the number of neurons in each layer of the proposed neural network. This likewise the `numbe of layers` and because of the same reasons it's not a static property and changes overtime.                                                                                                                                                                                         |
+| **learning rate**      | This is the well-know and crucial hyperparameter of each neural networks, which while training controls how much to change the model in response to the estimated error each time the model weights are updated.                                                                                                                                                                                          |
+| **convolutional size** | This is a special type of property, and it's only useful when working with image datasets. This parameter reflects the image size (width x height) in pixels. It is store as tuple of two values (width, height).                                                                                                                                                                                         |
 
 Furthermore, from a programing point of view it is represented as a class with five attributes reflecting the mentioned ones:
 
@@ -60,13 +61,70 @@ class State:
         self.conv_ize = conv_size
 ```
 
-## Action
+As in every RL problem we define two types of states **initial** and **terminal** state.
+Every run on a new dataset creates the initial state like the following:
+
+    - number of classes - deducted from the dataset
+    - number of features - deducted from the dataset
+    - number of layers - initial value set to 1
+    - hidden size - initial value set to 1
+    - learning rate - initial value set to 1
+    - convolutional size - set by the developer when workinh with image dataset, `null` otherwise
+
+The terminal state in our problem is not an explicit one, but it can be considered implicitly. That is done by the 
+`stop function`. The stop function has a `comparing property` which is either than two values **accuracy** or **loss**, 
+and checks several stopping conditions regarding the `comparing property` we have chosen, so we can have a comparison
+of the two stopping criteria which suits better for the problem. Either way it can be said that the ***terminal state 
+is not an explicit state with known values to be achieved, but it is implicitly defined by the `stop function`***. (Details
+about stop function in the corresponding section)
+
+### 3.2. Action
 
 The actions in our project are represented as a set of changeable parameters for the neural network. The representation
 is like the state, but the actions are constructed just of the parameters that can be changed and the performance is
 dependent on them in the neural network. Every next possible action has a change in just one of the parameters from the
 previous, consequently the number of the next possible actions from a current state is the number of parameters in the
-action.
+action. We offer for set of actions:
+
+| Action               | Description                                                                                                                     |
+|----------------------|---------------------------------------------------------------------------------------------------------------------------------|
+| **number of layers** | Number of layers in the neural network. This is only referring to the hidden layer, it is not including input and output layer. |
+| **hidden size**      | Number of neurons in the hidden layers.                                                                                         |
+| **learning rate**    | The learning rate with which the neural networks adapts to weights update during training.                                      |
+
+In the project the actions are represented by class containing all three properties:
+
+```python
+class Actions:
+    def __init__(self, num_layers, hidden_size, learning_rate):
+        super().__init__()
+        self.num_layers = num_layers
+        self.hidden_size = hidden_size
+        self.learning_rate = learning_rate
+```
+
+As we can see we are working with **discrete action space** of 3 actions, therefore it makes the environment of the project a **infinite discrete environment**,
+stating we have an infinite number of states where we can act with discrete actions. Once an actions is chosen by our agent then we need to implement the action
+in the following way:
+
+    - number of layers - the corresponding property in the current state is incremented by 1
+    - hidden size - the corresponding property in the current state is incremented by 1
+    - learning rate - the corresponding property in the current state is incremented by 1
+
+From programming point of view it would look like this: 
+
+```python
+    def implement_action(self, action):
+        """"sets the new current state implementing the action given as a parameter
+         :param action object from the class Action"""
+        attribute = self.action_decoding_dict.get(action)
+        previous_value = self.current_state.__getattribute__(attribute)
+        if attribute == "learning_rate":
+            self.current_state.__setattr__(attribute, previous_value + 0.0001)
+        else:
+            self.current_state.__setattr__(attribute, previous_value + 1)
+        self.actions = from_state_to_action(self.current_state)
+```
 
 ## Generator
 
