@@ -68,7 +68,7 @@ Every run on a new dataset creates the initial state like the following:
     - number of features - deducted from the dataset
     - number of layers - initial value set to 1
     - hidden size - initial value set to 1
-    - learning rate - initial value set to 1
+    - learning rate - initial value set to 0.0001
     - convolutional size - set by the developer when workinh with image dataset, `null` otherwise
 
 The terminal state in our problem is not an explicit one, but it can be considered implicitly. That is done by the 
@@ -78,7 +78,7 @@ of the two stopping criteria which suits better for the problem. Either way it c
 is not an explicit state with known values to be achieved, but it is implicitly defined by the `stop function`***. (Details
 about stop function in the corresponding section)
 
-### 3.2. Action
+### 3.2. Actions
 
 The actions in our project are represented as a set of changeable parameters for the neural network. The representation
 is like the state, but the actions are constructed just of the parameters that can be changed and the performance is
@@ -109,7 +109,7 @@ in the following way:
 
     - number of layers - the corresponding property in the current state is incremented by 1
     - hidden size - the corresponding property in the current state is incremented by 1
-    - learning rate - the corresponding property in the current state is incremented by 1
+    - learning rate - the corresponding property in the current state is incremented by 0.0001
 
 From programming point of view it would look like this: 
 
