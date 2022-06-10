@@ -36,21 +36,15 @@ the conditions to be considered as a MDP problem. Generally there are two condit
 
 A state is represented by a set of parameters for the neural network, to create a neural network suitable for the given
 dataset. We keep track of more parameters and those are:
-    - **number of classes** - This parameter as strictly derived from the dataset it is currently the object of observing
-                              Considering we are only taking care of classification problem. this would be the number of target
-                              classes in the dataset itself.
-    - **number of features** - This parameter like the previous as well can be derived from dataset i.e. the number of attributes
-                               we can learn from.
-    - **number of layers** - Considering the state reflects the current neural network model which is proposed as a solution for
-                             evaluation, this property represents the number of layers in it. This is not a static property like 
-                             the previous two properties which are ones initialized and stay the same. This is directly influenced
-                             by the actions(described in next section), which are supposed to modify the neural network.
-    - **hidden size** - The hidden size reflects the number of neurons in each layer of the proposed neural network. This likewise the
-                        `numbe of layers` and because of the same reasons it's not a static property and changes overtime.
-    - **learning rate** - This is the well-know and crucial hyperparameter of each neural networks, which while training controls 
-                          how much to change the model in response to the estimated error each time the model weights are updated.
-    - **convolutional size** - This is a special type of property and it's only useful when working with image datasets. This parameter
-                               reflects the image size (width x height) in pixels. It is store as tuple of two values (width, height).
+
+| Parameter | Description |
+| --------- | ----------- |
+| **number of classes** | This parameter as strictly derived from the dataset it is currently the object of observing. Considering we are only taking care of classification problem. this would be the number of target classes in the dataset itself.|
+| **number of features** | This parameter like the previous as well can be derived from dataset i.e. the number of attributes we can learn from.|
+| **number of layers** | Considering the state reflects the current neural network model which is proposed as a solution for evaluation, this property represents the number of layers in it. This is not a static property like the previous two properties which are ones initialized and stay the same. This is directly influenced by the actions(described in next section), which are supposed to modify the neural network.|
+| **hidden size** | The hidden size reflects the number of neurons in each layer of the proposed neural network. This likewise the `numbe of layers` and because of the same reasons it's not a static property and changes overtime.|
+| **learning rate** | This is the well-know and crucial hyperparameter of each neural networks, which while training controls how much to change the model in response to the estimated error each time the model weights are updated. |
+| **convolutional size** | This is a special type of property, and it's only useful when working with image datasets. This parameter reflects the image size (width x height) in pixels. It is store as tuple of two values (width, height).|
 
 Furthermore, from a programing point of view it is represented as a class with five attributes reflecting the mentioned ones:
 
