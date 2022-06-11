@@ -42,7 +42,7 @@ class NASEnvironment(Env):
                                 callbacks=[tensorboard_manager.callback(iteration=len(self.rewards) + 1,
                                                                         episode=action.episode())])
         predictions = model.predict(x=test_f, batch_size=10, verbose=0)
-        self.loss.append(fit_results.history['loss'][-1])
+        # self.loss.append(fit_results.history['loss'][-1])
         rounded_predictions = np.argmax(predictions, axis=-1)
         rounded_classes = np.argmax(test_c, axis=1)
         self.log_confusion_matrix(manager=tensorboard_manager,
@@ -50,6 +50,10 @@ class NASEnvironment(Env):
                                   y_predictions=rounded_predictions,
                                   episode=action.episode())
         reward = NeuralNetworkMetrics.accuracy(rounded_classes, rounded_predictions)
+        tmp_loss = NeuralNetworkMetrics.loss(rounded_classes, rounded_predictions)
+        self.loss.append(tmp_loss)
+        # adding to dictionary
+        self.loss_dic[action.learning_rate()] = tmp_loss
         self.log_hyper_parameters(manager=tensorboard_manager,
                                   number_of_layers=action.number_of_layers(),
                                   hidden_size=action.hidden_size(),
@@ -71,8 +75,8 @@ class NASEnvironment(Env):
         self.rewards = []
 
     def is_done(self):
-        df = pd.DataFrame(self.rewards)
-        return self.rewards[-1] == 1 or DataFrameWorker.decreasing_or_constant(df)
+        df = pd.DataFrame(self.loss)
+        return not DataFrameWorker.decreasing_or_constant(df)
 
     def log_confusion_matrix(self, manager, y, y_predictions, episode):
         class_names = self.dataSet.classes(result_type=ResultType.PLAIN)
