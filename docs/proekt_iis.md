@@ -1,6 +1,38 @@
 # Neural Architecture Search with Deep Reinforcement Learning
+> By Nikola Gjorgjievski(171183), Jana Gjelevska(index-jana)
+> 
+> Skopje, June, 2022
+> 
+> Faculty of computer science and engineering
+
+## Table of contents
+- [Motivation](#motivation)
+- [Intro](#1-intro)
+- [REINFORCE algorithm](#2-reinforce-algorithm)
+- [Problem formalizations](#3-problem-formalization)
+  - [States](#31-state)
+    - [Start state](#311-startinitial-state)
+    - [Terminal states](#312-terminal-state)
+      - [Stop function](#stop-function)
+  - [Actions](#32-actions)
+  - [Transition function](#33-transition-function)
+  - [Rewards & Discount factor](#34-rewards-and-discount-factor)
+- [Project setup](#4-project-setup)
+  - [Generator](#41-generator)
+  - [Controller](#42-controller)
+  - [Environment](#43-the-environment)
+  - [Policy](#44-policy)
+- [Data preprocessing](#5-data-preprocessing)
+  - [The DATASET abstraction](#51-the-dataset-abstraction)
+- [Evaluation methods](#6-evaluation-methods)
+  - [Visualisations](#61-visualisations)
+  - [Logs](#62-logs)
+- [Testing & Results](#7-testing-and-results)
+- [Conclusion](#8-conclusion)
+- [REFERENCES](#references)
 
 ## Motivation
+
 > [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/wL-p5cjDG64/0.jpg)](http://www.youtube.com/watch?v=wL-p5cjDG64)
 > 
 > Placeholder for video summary
@@ -9,7 +41,10 @@
 > 
 > Placeholder for paper summary
 
-## REINFORCE Algorithm
+## 1. Intro
+> Placeholder for INTRO summary
+
+## 2. REINFORCE Algorithm
 
 As previously stated the core of this project is to show the power of reinforcement learning, more specifically deep
 reinforcement learning. That is a combination of the most currently relevant AI fields which are Deep Learning and
@@ -169,12 +204,25 @@ From programming point of view it would look like this:
 ```
 
 ### 3.3. Transition function
+> Placeholder for TRANSITION FUNCTION summary
 
 ### 3.4. Rewards (and discount factor)
 
+#### Reward
 
+We decided that the most appropriate value as a reward for our problem would be the accuracy. So in one iteration of an
+episode, we choose an action. By implementing the action(as previously described) we generate a neural network model, which
+then we train it on the given dataset. That dataset is divided on train set and test set. After the training we evaluate the
+model performance on the test set and calculate the **accuracy**, that accuracy is then returned and taken as a reward for 
+taking the corresponding action.
 
-## Generator
+#### Discount factor
+> Placeholder for DISCOUNT FACTOR summary
+
+## 4. Project setup
+> Placeholder for project setup intro summary
+
+### 4.1. Generator
 
 The generator is providing the neural network models contracted by the current state updated in the current action.
 Depending on the scale of the dataset and its features the generator provides a suitable model whose performance is
@@ -198,8 +246,9 @@ forward neural networks and the other one generates convolutional neural network
 
 
 ```
+> Placeholder for GENERATOR summary
 
-## Controller
+### 4.2. Controller
 
 The controller is the main part in which all the steps are taken and the logic is implemented. All parts of the
 application are coming together and eventually communicating through its actions. During the initialization the values
@@ -247,13 +296,49 @@ called.
        
   
 ```
+> Placeholder for CONTROLLER summary
 
-## Data preprocessing
+### 4.3. The Environment
+
+This is our abstraction of the standard `Gym` environments in order to be able to treat the problem as a standard reinforcement learning problem.
+It offers the well-known `step` method which returns the know variables but with our computation logic:
+```sh
+		1. state - the model which was trained
+		2. reward - accuracy on the specified dataset
+		3. done - if the rewards starts to constantly decrease (currently done after 3 iterations) - NEEDS TO BE IMPROVED
+		4. info - dictionary of two fields:
+			-rewards during playing (so far)
+			-taken actions (so far)
+```
+
+> Placeholder for ENVIRONMENT summary
+
+### 4.4. Policy
+
+The policy state is kept throughout the time. With the help of `Keras`, since the policy is a neural network we save the policy weights after each dataset,
+so on the next dataset it can load the weights first and then act with greater knowledge.
+```sh
+.../RLPolicyAgent.py
+
+    def load_model(self):
+        try:
+            return KerasLogger.load_latest_policy()
+        except PolicyWeightsNotFound:
+            return self._build_model()
+```
+
+> Placeholder for POLICY summary
+
+## 5. Data preprocessing
+
+> Placeholder for DATA PREPROCESSING INTRO summary
+
+### 5.1. The DATASET abstraction
 
 So far the project only works with standard datasets and image datasets. We created class abstractions in order to
 process datasets. In the file `DatasetApstractions` there's a class called `Dataset` which only serves to process **
 standard datasets** i.e. dataset in CSV format, which only consists of plain features and target class (whether is
-multiple columns or not). Only input parametrs are the absolute path to where the dataset is stored, as well as the
+multiple columns or not). Only input parameters are the absolute path to where the dataset is stored, as well as the
 delimiter used in the CSV file. A requirement for our `Dataset` class to works is that every column in the dataset
 should be prefixed with `class_<column-name>` (ex. class_humidity), in order to recognize them when working with them.
 Then for every dataset we have several methods out of the box:
@@ -316,34 +401,11 @@ is encoded accordingly.
 Previously i mentioned that we also support image datasets but for them there is no generic way to apstract them with one class, the way we are handling them 
 is we derive the `Dataset` class and implement each method one by one to be able to process the concrete dataset.
 
-## Policy
 
-The policy state is kept throughout the time. With the help of `Keras`, since the policy is a neural network we save the policy weights after each dataset,
-so on the next dataset it can load the weights first and then act with greater knowledge.
-```sh
-.../RLPolicyAgent.py
+## 6. Evaluation methods 
+> Placeholder for EVALUATION METHODS summary
 
-    def load_model(self):
-        try:
-            return KerasLogger.load_latest_policy()
-        except PolicyWeightsNotFound:
-            return self._build_model()
-```
-
-## NAS Environment
-
-This is our abstraction of the standard `Gym` environments in order to be able to treat the problem as a standard reinforcement learning problem.
-It offers the well-known `step` method which returns the know variables but with our computation logic:
-```sh
-		1. state - the model which was trained
-		2. reward - accuracy on the specified dataset
-		3. done - if the rewards starts to constantly decrease (currently done after 3 iterations) - NEEDS TO BE IMPROVED
-		4. info - dictionary of two fields:
-			-rewards during playing (so far)
-			-taken actions (so far)
-```
-
-## Tensorboard visualisations
+### 6.1. Visualisations
 
 `Tensorboard` is the tool we decided to use for visualisations. So far we save the following statistics:
 
@@ -381,3 +443,16 @@ what part of the neural network is most exhausting the algorith etc.
 ![recommendations](./images/reccomendations.png)
 
 More details about concrete visualisations and their evaluation in the section about testing phases.
+
+### 6.2. Logs
+> Placeholder for LOGS summary
+
+## 7. Testing and results
+> Placeholder for TESTING AND RESULTS summary
+
+## 8. Conclusion
+> Placeholder for CONCLUSION summary
+
+
+## REFERENCES
+> Placeholder for REFERENCES
