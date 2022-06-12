@@ -1,6 +1,9 @@
 # Neural Architecture Search with Deep Reinforcement Learning
 
 ## Motivation
+[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/wL-p5cjDG64/0.jpg)](http://www.youtube.com/watch?v=wL-p5cjDG64)
+> Placeholder for video summary
+> Placeholder for paper summary
 
 ## REINFORCE Algorithm
 
@@ -20,6 +23,8 @@ The deep reinforcement learning field basically can be divided in two types of a
 
 Every RL based type of learning has only one goal, and that is to maximize the "expected" reward throughout the learning process. However,
 the difference in all the algorithm 
+
+> Placeholder for REINFORCE algorithm explanation summary
 
 
 ## 3. Problem formalization
@@ -86,6 +91,8 @@ class State:
         self.conv_ize = conv_size
 ```
 
+#### 3.1.1. Start/initial state
+
 As in every RL problem we define two types of states **initial** and **terminal** state.
 Every run on a new dataset creates the initial state like the following:
 
@@ -96,12 +103,18 @@ Every run on a new dataset creates the initial state like the following:
     - learning rate - initial value set to 0.0001
     - convolutional size - set by the developer when workinh with image dataset, `null` otherwise
 
+#### 3.1.2. Terminal state
+
 The terminal state in our problem is not an explicit one, but it can be considered implicitly. That is done by the 
 `stop function`. The stop function has a `comparing property` which is either than two values **accuracy** or **loss**, 
 and checks several stopping conditions regarding the `comparing property` we have chosen, so we can have a comparison
 of the two stopping criteria which suits better for the problem. Either way it can be said that the ***terminal state 
 is not an explicit state with known values to be achieved, but it is implicitly defined by the `stop function`***. (Details
 about stop function in the corresponding section)
+
+#### Stop function
+> Placeholder for stop function summary
+
 
 ### 3.2. Actions
 
