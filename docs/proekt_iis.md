@@ -29,8 +29,33 @@ network model will be used for. Since we decided to propose a solution with the 
 modeled as a MDP(Markov Decision Process) problem. But before we even model it as that, we needed to make sure that the problem satisfies 
 the conditions to be considered as a MDP problem. Generally there are two conditions:
 
-    - The `Markov property`
-    - The `Markov process`
+    - The `Markov property` - the future is independent of the past if we know the current state
+                                - In our problem the state (in detailed explained in section 3.1.) is a neural network model
+                                  which is proposed for the dataset atm. When we take an action we modify one of three neural
+                                  network properties(number of layers, hidden size or learning rate). The modifications are
+                                  applied to the current state(neural network) model.
+                                    ex. Current model has:
+                                        - number of layers: 2
+                                        - hidden size: 10
+                                        - learning rate: 0.001
+                                        Choosing random action: number of layers (incremented by 1)
+                                        New state will be:
+                                        - number of layers: 3 (only this property has been changed)
+                                        - hidden size: 10
+                                        - learning rate: 0.001
+                                Therefore, the next state is determined only by the current state and chosen action, there is no need
+                                to keep track of states from the initial state till now.
+    - The `Markov process` - sequence of states that obey the `Markov property`
+                                - It is clear by the first point that the states modeled as they are in our problem adapt the rules
+                                  of the `Markov property`
+
+Since we have proved that the nature of the problem satisfies the MDP problem conditions it's time to define the MDP by defining:
+- set of **States** (section 3.1.)
+    - start/initial state
+    - (possibly) terminal state
+- set of **Actions** (section 3.2.)
+- **Transition function** (section 3.3.)
+- **Rewards (and possibly discount)** (section 3.4.)
 
 
 ###  3.1. State
@@ -125,6 +150,12 @@ From programming point of view it would look like this:
             self.current_state.__setattr__(attribute, previous_value + 1)
         self.actions = from_state_to_action(self.current_state)
 ```
+
+### 3.3. Transition function
+
+### 3.4. Rewards (and discount factor)
+
+
 
 ## Generator
 
