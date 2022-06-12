@@ -1,8 +1,12 @@
 # Neural Architecture Search with Deep Reinforcement Learning
 
 ## Motivation
-[![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/wL-p5cjDG64/0.jpg)](http://www.youtube.com/watch?v=wL-p5cjDG64)
+> [![IMAGE ALT TEXT HERE](http://img.youtube.com/vi/wL-p5cjDG64/0.jpg)](http://www.youtube.com/watch?v=wL-p5cjDG64)
+> 
 > Placeholder for video summary
+> 
+> [Link to paper](https://openreview.net/pdf?id=r1Ue8Hcxg "Paper link")
+> 
 > Placeholder for paper summary
 
 ## REINFORCE Algorithm
