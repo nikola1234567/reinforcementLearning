@@ -167,7 +167,7 @@ class ImageDataSet(Dataset):
         """helper function for image dataset"""
 
         list_class_matrix = list()
-        for i in range(len(self.dataset_df)):
+        for i in range(1000):
             mat = np.zeros((48, 48), dtype=np.uint8)
             txt = self.dataset_df['pixels'][i]
             ex_class = self.dataset_df['emotion'][i]
