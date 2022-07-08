@@ -49,7 +49,7 @@ class NASEnvironment(Env):
                                   y=rounded_classes,
                                   y_predictions=rounded_predictions,
                                   episode=action.episode())
-        reward = NeuralNetworkMetrics.accuracy(rounded_classes, rounded_predictions)
+        reward = NeuralNetworkMetrics.loss(rounded_classes, rounded_predictions)
         tmp_loss = NeuralNetworkMetrics.loss(rounded_classes, rounded_predictions)
         self.loss.append(tmp_loss)
         # adding to dictionary
@@ -64,7 +64,7 @@ class NASEnvironment(Env):
         done = self.is_done()
         info = {REWARD_SERIES_KEY: self.rewards,
                 NUMBER_OF_ACTIONS_EXECUTED_KEY: len(self.rewards)}
-        return state, reward, done, info
+        return state, tmp_loss, done, info
 
     def render(self, mode="human"):
         # TODO: To be decided what to visualise
@@ -75,8 +75,12 @@ class NASEnvironment(Env):
         self.rewards = []
 
     def is_done(self):
+        """
+        Check if the loss is increasing and preventing quick end by requiring loss list of min 3
+        :return: true/false
+        """
         df = pd.DataFrame(self.loss)
-        return not DataFrameWorker.decreasing_or_constant(df)
+        return self.loss[-1] <= 0.05 or len(self.loss) >= 3 and not DataFrameWorker.decreasing_or_constant(df)
 
     def log_confusion_matrix(self, manager, y, y_predictions, episode):
         class_names = self.dataSet.classes(result_type=ResultType.PLAIN)

@@ -1,11 +1,12 @@
 from enum import Enum
-import numpy as np
 
+import numpy as np
 from sklearn import model_selection
 from tensorflow.keras.utils import to_categorical
+
 from Apstractions.DataPreprocessing.DataEncoders import *
-from Apstractions.FileApstractions.FileWorker import FileWorker
 from Apstractions.DatasetApstractions.DatasetSamples.DatasetsPaths import *
+from Apstractions.FileApstractions.FileWorker import FileWorker
 
 
 def sting_to_integer(s):
@@ -167,7 +168,7 @@ class ImageDataSet(Dataset):
         """helper function for image dataset"""
 
         list_class_matrix = list()
-        for i in range(len(self.dataset_df)):
+        for i in range(1500):
             mat = np.zeros((48, 48), dtype=np.uint8)
             txt = self.dataset_df['pixels'][i]
             ex_class = self.dataset_df['emotion'][i]
